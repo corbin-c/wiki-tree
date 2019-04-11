@@ -6,11 +6,17 @@
 <body>
 <?php
 ini_set('memory_limit', '1024M');
-include("./array.php");
-$n=0;
-function wikiquery($s) {
+$n = 0;
+function wikiquery($s,$c,$d) {
 	global $n;
-	$url = "http://fr.wikipedia.org/w/api.php?action=query&cmtitle=".urlencode($s)."&format=dbg&cmlimit=500&list=categorymembers";
+	if ($c == NULL)
+	{
+		$url = "http://fr.wikipedia.org/w/api.php?action=query&cmtitle=".urlencode($s)."&format=dbg&cmlimit=500&list=categorymembers&continue=";
+	}
+	else
+	{
+		$url = "http://fr.wikipedia.org/w/api.php?action=query&cmtitle=".urlencode($s)."&format=dbg&cmlimit=500&list=categorymembers&continue=-||&cmcontinue=".urlencode($c);
+	}
 	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_HTTPGET, TRUE);
 	curl_setopt($ch, CURLOPT_POST, FALSE);
@@ -24,52 +30,33 @@ function wikiquery($s) {
 	curl_setopt($ch, CURLOPT_USERAGENT, "Dat-Tree Project - https://www.github.com/Tougodo/dat-tree");
 	$str = curl_exec($ch);
 	eval('$data = ' . $str . ';');
-	$data = $data["query"]["categorymembers"];
-	foreach($data as $cle => $element)
-	{	
-		if ($element["ns"]==14 && $n <= 50)
-		{
-			$data[$cle]["catfille"]=wikiquery($element["title"]);
-			//echo $element["title"];
-			//echo "<br/>";
-		}
-		if ($cle+1==count($data)) //on est au bout d'une branche
-		{
-			$n=$n+1;
-			//echo $n;
-			//echo "<br/>";
-		}
-	}
-	return $data;
-}
-function continuer($tableau) {
-	global $n;
-	foreach($tableau as $cle => $element)
+	$donnees = $data["query"]["categorymembers"];
+	if ($d == NULL)
 	{
-		if ($element["ns"]==14)
-		{
-			if (!isset($element["catfille"]))
-			{
-				$tableau[$cle]["catfille"] = wikiquery($tableau[$cle]["title"]);
-				//$m++;
-				//echo $tableau[$cle]["title"];
-				//echo "<br/>";
-				
-			}
-			else
-			{
-				$tableau[$cle]["catfille"] = continuer($element["catfille"]);
-			}			
-		}
-
+		$d = $donnees; //l'array des résultats
 	}
-	return $tableau;
+	else
+	{
+		$d = array_merge($d,$donnees);
+	}
+	if (isset($data["continue"]["cmcontinue"]) && $n <= 100)
+	{
+		$continue = $data["continue"]["cmcontinue"];
+		if ($n == 100)
+		{
+			echo "<strong style='color: red;'>";
+			echo $continue;
+			echo "</strong><br/>";
+		}
+		$n++;
+		$d = wikiquery("Catégorie:Portail:Musique/Articles_liés",$continue,$d);
+	}
+	return $d;
 }
 echo "<pre>";
-
-var_export(continuer($donnees));
+var_export(wikiquery("Catégorie:Portail:Musique/Articles_liés","page|3d27334357270704273d2f5527412d492f0342273d2f5527412d492f043d27334357270126018f7f8f7d8f7d8f0900|46661",NULL));
+//echo count($truc);
 echo "</pre>";
-//continuer($donnees);
 ?>
 </body>
 </html>
