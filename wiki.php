@@ -139,10 +139,25 @@ function lienmusical($q,$d) {
 	}
 }
 
-
-
-if (isset($_POST['recherche']))
+if (isset($_GET['cat']))
 {
+	$cat_del = $_GET['cat'];
+	$liens = $_GET['liens'];
+	$len = $_GET['len'];
+	$degre = $_GET['deg'];
+	$lienslt = "off";
+	goto b;
+}
+elseif (isset($_POST['len'])) {
+	$len = $_POST['len'];
+	$liens = $_POST['liens'];
+	$lienslt = $_POST['lienslt'];
+	$degre = $_POST['degre'];
+	goto b;
+}
+elseif (isset($_POST['recherche']))
+{
+
 	$artiste["titre"] = $_POST['recherche'];
 	$projet = $_POST['projet'];
 	if (!(is_numeric($_POST['degre']))) { $degre = 0; } else { $degre = $_POST['degre']; }
@@ -188,7 +203,6 @@ Choisir les catégories affichées :<br/>
 	}
 	else
 	{
-		
 		a:
 		foreach($artiste["catmere"] as $cle => $element)
 		{
@@ -223,121 +237,56 @@ Choisir les catégories affichées :<br/>
 				}
 			}
 		}
+		file_put_contents("cache.json", json_encode($artiste));
 				//echo "<pre>";
 		//var_export($artiste);
 		//echo "</pre>";
+		b:
+		if (isset($len))
+		{
+			$artiste = json_decode(file_get_contents("cache.json"),true);
+			if (isset($cat_del))
+			{
+				unset($artiste["catmere"][$cat_del]);
+			}
+			foreach($artiste["catmere"] as $cle => $element)
+			{
+				foreach($element["filles"] as $k => $elt)
+				{
+					if (!doublons($elt,$degre))
+					{
+						unset($artiste["catmere"][$cle]["filles"][$k]);
+					}
+				}
+			}
+			file_put_contents("cache.json", json_encode($artiste));
+		}
+		else
+		{
+			$len = 3;
+		}
 		require_once 'Image/GraphViz.php';
+		include("graph.php");
 			$gatts=array( //defaults for graph level attributes
-			    'size'=>20,
-			    'font'=>"Sans-serif",
+				'size'=>20,
+				'bgcolor'=>"#f0ede6", 
+				'font'=>"sans-serif",
 			);
 		  $graph = new Image_GraphViz(true,$gatts);
-
-		  $graph->addNode(
-		    $artiste["titre"],
-		    array(
-		      'URL'   => "javascript:youwig('".urlencode($artiste['titre'])."')",
-		      'label' => $artiste["titre"],
-		      //'shape' => 'box',
-		      'color' => 'red',
-			'fixedsize'  => FALSE,
-			'style' => 'filled',
-			'fillcolor' => '#FF0000',
-			'fontsize'  => 20,
-			'margin'  => "0.1, 0.1",
-			'splines'  => TRUE,
-			'overlap'  => FALSE
-		    )
-		  );
-		
-		foreach($artiste["catmere"] as $cle => $element)
-			{
-			$r=rand(0,255);
-			$b=rand(0,255);
-			$v=rand(0,255);
-			  $graph->addNode(
-			    $element["title"],
-			    array(
-			      //'URL'      => 'http://link2',
-				'shape' => 'box',
-				'style' => 'filled',
-				'fillcolor' => "#".zeropad(dechex($r),2).zeropad(dechex($v),2).zeropad(dechex($b),2),
-				'fixedsize'  => FALSE,
-				'fontsize'  => 16,
-				'margin'  => "0.01, 0.01",
-				'splines'  => TRUE,
-				'overlap'  => FALSE,
-			    )
-			  );
-			$graph->addEdge(
-			    array(
-			      $artiste["titre"] => $element["title"]),
-			   array('arrowsize' => 0.3,
-			   'sametail' => TRUE,
-			   'len'  => 5)
-			   
-			   );
-		foreach($element["filles"] as $k => $elt)
-			{
-		$graph->addNode(
-			    $elt["title"],
-			    array(
-			      'URL'      => "javascript:youwig('".urlencode($elt["title"])."')",
-				'fixedsize'  => FALSE,
-				'fontsize'  => 14,
-				'margin'  => "0.01, 0.01",
-				'splines'  => TRUE,
-				'overlap'  => FALSE,
-			    )
-			  );
-			$graph->addEdge(
-			    array(
-			      $elt["title"] => $element["title"]),
-			    array('arrowsize' => 0.3,
-			   	'sametail' => FALSE,
-				'color' => "#".zeropad(dechex($r),2).zeropad(dechex($v),2).zeropad(dechex($b),2),
-			   	'len'  => 7,
-				)
-			   );
-			}
-			//if ($r+$couleurdiff < 220) {$r = $r+$couleurdiff;}
-			//elseif ($v+$couleurdiff < 240) {$v = $v+$couleurdiff;}
-			//elseif ($b+$couleurdiff < 255) {$b = $b+$couleurdiff;}
-
-			//echo "rouge:".$r."vert".$v."bleu:".$b."<br/>";
-		}
-		if ($liens == "on")
-		{
-			foreach($artiste["liens"] as $cle => $element)
-			{
-			    $graph->addNode(
-			    $element["title"],
-			    array(
-			      'URL'      => "javascript:youwig('".urlencode($element["title"])."')",
-				'style' => 'filled',
-				'fillcolor' => "#DCFCCC",
-				'fixedsize'  => FALSE,
-				'fontsize'  => 14,
-				'margin'  => "0.01, 0.01",
-				'splines'  => TRUE,
-				'overlap'  => TRUE,
-			    )
-			  );
-			$graph->addEdge(
-			    array(
-			      $artiste["titre"] => $element["title"]),
-			   array('arrowsize' => 0.3,
-			   'sametail' => TRUE,
-			   'len'  => 3,
-				'id' => "fille")
-			   );
-			}
-		}  
+		graph($artiste,$graph,$len,$liens,$degre);
 		$code_svg=str_replace('<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">', "",$graph->fetch('svg','neato'));
+		$code_svg=str_replace('font-family="sans-serif" font-size="16.00"',"",$code_svg);
+		//$code_svg=str_replace('<svg width="1440pt" height="1389pt"','<svg width="100%" height="100%"',$code_svg);
 		echo "<!DOCTYPE html><html><head>
+<script type='text/javascript' src='cache3.js'></script>
 <script type='text/javascript' src='youwig.js'></script><style>
+html, body
+{
+	background-color: #f0ede6;
+	padding: none;
+}
 .edge:hover path, .edge:hover polygon {
 stroke-width: 2.5px;
 }
@@ -345,20 +294,53 @@ stroke-width: 2.5px;
 {
 stroke-width: 2.5px;
 }
-.node:hover ellipse
+.node:hover ellipse, .node:hover text, .node:hover polygon
 {
 stroke-width: 2.5px;
+font-weight: bold;
+}
+.edge
+{
+   transition-duration: 0.35s;
+   transition-timing-function: ease-in;
+   transition-delay: 0s;
+}
+polygon + text {
+	font-family: Times;
+}
+ellipse + text {
+	font-family: Arial;
+}
+#menuflottant
+{
+	position: fixed;
+	background-color: #DDDDDD;
 }
 </style>
 <meta charset='utf-8' /></head><body>";
+?>
+<p id="menuflottant">
+<form action="wiki.php" method="POST">
+<label for="len"></label><input type="range" value="<?php echo $len;?>" max="9" min="3" step="1" id="len" name="len"/><br/>
+<input type="hidden" value="<?php echo $liens; ?>" name="liens" />
+<input type="hidden" id="lienslt" name="lienslt" value="<?php echo $lienslt; ?>" />
+<input type="range" id="degre" name="degre"  max="9" min="1" step="1" value="<?php echo $degre; ?>" /><br/>
+<input type="submit" />
+</form>
+</p>
+<?php
 		echo $code_svg;
+		echo "<!-- Original idea, algorithm and coding by Clément Corbin Tramu\n";
+		echo "Readibility improvements idea with opacity transitions by Edgar Rock\n";
+		echo "Data from Wikipedia -->\n";
 		echo "</body></html>";
 		//echo json_encode($artiste);
 	
 	}
 }
 else
-{?>
+{
+?>
 <!DOCTYPE html>
 <html>
 	<head>
