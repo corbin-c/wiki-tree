@@ -3,16 +3,9 @@
 	margin: 0;
 	padding: 0;
 }
-/*.links line {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}*/
-
 .nodes circle {
- /// stroke: #fff;
   stroke-width: 1.5px;
 }
-
 html, body
 {
 	height: 100%;
@@ -107,20 +100,6 @@ fieldset
 	font-family: Sans;
 	padding-top: 10px;
 }
-/*fieldset input
-{
-	width: 20%;
-	vertical-align: top;
-	position: relative;
-	//bottom: 1px;
-	margin-bottom: 10px;
-	//height: 20px;
-}
-fieldset label
-{
-	//height: 40px;
-	display: block;
-}*/
 legend
 {
 	margin-left: 20px;
@@ -134,14 +113,12 @@ label {
     cursor: pointer;
 }
 
-/* Hide the browser's default checkbox */
 label input {
     position: absolute;
     opacity: 0;
     cursor: pointer;
 }
 
-/* Create a custom checkbox */
 .checkmark {
     position: absolute;
     bottom: 1px;
@@ -152,30 +129,25 @@ label input {
     border: 1px solid #e7b576;
 }
 
-/* On mouse-over, add a grey background color */
 label:hover input ~ .checkmark {
     background-color: #ccc;
 }
 
-/* When the checkbox is checked, add a blue background */
 label input:checked ~ .checkmark {
     background-color: #e7b576;
     border: 1px solid #fff;
 }
 
-/* Create the checkmark/indicator (hidden when not checked) */
 .checkmark:after {
     content: "";
     position: absolute;
     display: none;
 }
 
-/* Show the checkmark when checked */
 label input:checked ~ .checkmark:after {
     display: block;
 }
 
-/* Style the checkmark/indicator */
 label .checkmark:after {
     left: 4px;
     top: 1px;
@@ -187,13 +159,8 @@ label .checkmark:after {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
-
-
-
 section
 {
-	//border-top: 1px solid #4C4C49;
-	//padding-top: 5px;
 	position: absolute;
 	top: 40%;
 	width: 82%;
@@ -230,7 +197,6 @@ svg text
 {
 	font-size: 0.5em;
 	fill: #999999;
-	//opacity: 0.6;
 	visibility: hidden;
 
 }

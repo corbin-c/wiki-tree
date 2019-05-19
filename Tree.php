@@ -340,9 +340,9 @@ public function sonsOf($id)
 	}
 	return $r;
 }
-public function export_json()	// Exporter un json
+public function export_json()
 {
-	$json = array('nodes' => [], 'links' => [], 'log' => [], 'lang' => '');//, 'ilinks' => [],'node_list' => []);
+	$json = array('nodes' => [], 'links' => [], 'log' => [], 'lang' => '');
 	foreach ($this->nodes AS $e)
 	{
 		$json['nodes'][] = array('title' => $e->getTitle(), 'id' => $e->getId(), 'parent' => $e->getParent(), 'group' => $e->getGroup(), 'value' => $e->getValeur(), 'linked' => $e->getLinked());
@@ -355,15 +355,6 @@ public function export_json()	// Exporter un json
 		$json['links'][] = array('id' => $e->getId(), 'source' => $e->getSource(), 'target' => $e->getTarget(), 'strength' => $e->getStrength());
 	}
 	unset($e);
-	//$json['ilinks'] = $this->ilinks;	
-	/*foreach ($this->ilinks AS $e)
-	{
-		$json['ilinks'][] = array('id' => $e->getId(), 'source' => $e->getSource(), 'target' => $e->getTarget(), 'strength' => $e->getStrength());
-	}
-	unset($e);
-	$json['node_list'] = $this->node_list;	
-	$json['lastid'] = Node::get_current_i();
-	$json['lastlinkid'] = Link::get_current_i();*/
 	$json['lang'] = $this->lang;
 	$json['log'] = $this->log;
 	$json = json_encode($json);

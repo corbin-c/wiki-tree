@@ -96,11 +96,6 @@ function draw()
 				.style("opacity", 1)
 		nu.append("title")
 	      		.text(function(d) { return d.title; })
-		//var i = 1;
-		/*nu.filter(function(d) { return (d.group == 0) || (d.group == 2) }).each(function(d){ 
-							setTimeout(loadDoc("type=findlinks&rq=" + d.id + ""), duration*3*i);
-							i = i+1;
-						 }).select("circle").attr("fill","red");*/
 
 		bi = node.merge(nu)
 			bi.select("circle")

@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 
-<html xmlns:og="http://ogp.me/ns#">
-
+<html>
 	<head>
 		<meta charset="utf-8" />
 		<title> DAT' TREE ! </title>
 	<link rel="stylesheet" href="style.css" />
-	<script src="d3.v4.min.js"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
 	</head>
 	<body>
 <aside id="men3">
 <h3>Dat' Tree</h3>
 <form id="mainform">
-<input type="text" id="requete" value="" onkeypress="test(event)"/><!--<input type="submit" value="Vazi !" />--><br/>
+<input type="text" id="requete" value="" onkeypress="test(event)"/><br/>
 <input type="number" id="qt" value="1" onchange="qunatize()"/><br/>
 <?php include('lang.php'); ?>
 </form><form>

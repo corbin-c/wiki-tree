@@ -10,9 +10,8 @@
 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 	curl_setopt($ch, CURLOPT_MAXREDIRS, 4);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; he; rv:1.9.2.8) Gecko/20100722 Firefox/3.6.8");
+	curl_setopt($ch, CURLOPT_USERAGENT, "Dat-Tree - Experimental viz tool for wikipedia by C.CORBIN https://github.com/corbin-c/dat-tree");
 	$str = curl_exec($ch);
-	//echo $str;
 	$data = json_decode($str,true);
 	return $data;
 }
@@ -57,7 +56,6 @@ function get_wlinks($s,$pj)
 		}
 	}
 	$data = array_values($data);
-	//print_r($data);
 	return $data;
 }
 ?>
