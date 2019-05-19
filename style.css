@@ -1,0 +1,255 @@
+*
+{
+	margin: 0;
+	padding: 0;
+}
+/*.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}*/
+
+.nodes circle {
+ /// stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+html, body
+{
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	font-family : Sans;
+}
+h3
+{
+	height: 40px;
+	font-size: 1.8em;
+	margin-left: 60px;
+}
+#men3
+{
+	width: 20%;
+	height: 100%;
+	padding-left: 20px;
+	padding-top: 25px;
+	display: block;
+	background-color: #fbfbf7;
+	border-right: 1px solid #e7b576;
+	position: fixed;
+	top:0;
+	z-index: 8;
+	left:-30%;
+	transition: left 0.5s linear;
+	box-shadow: 0px 0px 8px grey;
+}
+#men3:target
+{
+	left: 0%;
+}
+#mainbutton
+{
+	z-index: 80;
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	display: block;
+	width: 40px;
+	height: 40px;
+	background-color: #fbfbf7;
+	border: 2px solid red;
+	color: red;
+	text-decoration: none;
+	font-size: 1.8em;
+	text-align: center;
+}
+form
+{
+	margin-top: 20px;
+}
+input
+{
+	height: 20px;
+	width: 50%;
+	padding-left: 3px;
+	padding-right: 3px;
+	border: 1px solid #e7b576;
+	background-color: white;
+	font-size: 0.8em;
+	font-family: Sans;
+	margin-bottom: 20px;
+}
+select, option
+{
+	padding: none;
+	margin: none;
+	height: 22px;
+	width: 53%;
+	border: 1px solid #e7b576;
+	background-color: white;
+}
+form [type=button]
+{
+	height: 22px;
+	margin-left: 5px;
+	width: 25%;
+}
+form [type=submit]
+{
+	width: 0;
+	height: 0;
+	opacity: 0;
+}
+fieldset
+{
+	border: 1px dotted #e7b576;
+	font-size: 0.8em;
+	width: 82%;
+	font-family: Sans;
+	padding-top: 10px;
+}
+/*fieldset input
+{
+	width: 20%;
+	vertical-align: top;
+	position: relative;
+	//bottom: 1px;
+	margin-bottom: 10px;
+	//height: 20px;
+}
+fieldset label
+{
+	//height: 40px;
+	display: block;
+}*/
+legend
+{
+	margin-left: 20px;
+}
+
+label {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+
+/* Hide the browser's default checkbox */
+label input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+    position: absolute;
+    bottom: 1px;
+    left: 10px;
+    height: 15px;
+    width: 15px;
+    background-color: #fff;
+    border: 1px solid #e7b576;
+}
+
+/* On mouse-over, add a grey background color */
+label:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+label input:checked ~ .checkmark {
+    background-color: #e7b576;
+    border: 1px solid #fff;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+label input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+label .checkmark:after {
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+
+
+section
+{
+	//border-top: 1px solid #4C4C49;
+	//padding-top: 5px;
+	position: absolute;
+	top: 40%;
+	width: 82%;
+	font-size: 0.75em;
+	//letter-spacing: 0.03em;
+ 	hyphens: auto;
+	text-align: justify;
+	//margin-right: 20px;
+	color: #4C4C49;
+	height: 45%;
+	overflow: hidden;
+}
+section ul li
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+section ul
+{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	padding-bottom: 7px;
+	margin-bottom: 8px;
+	border-bottom: 1px solid #4C4C49;
+}
+section img
+{
+	width: 24px;
+}
+svg text
+{
+	font-size: 0.5em;
+	fill: #999999;
+	//opacity: 0.6;
+	visibility: hidden;
+
+}
+#compl_search
+{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	padding-top: 7px;
+	margin-top: 8px;
+	border-top: 1px solid #4C4C49;
+	position: absolute;
+	top: 90%;
+	width: 82%;
+}
+#compl_search li
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
