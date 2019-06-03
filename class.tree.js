@@ -1,12 +1,9 @@
-function Tree(host,cors)
+function Tree()
 {
-	this.host = host;
 	this.lang = "en";
-	this.cors = cors;
 	this.nodes = {};
 	this.links = {};
 	this.wv = {};
-	this.headers = (this.cors) ? [["Content-Type", "application/json; charset=UTF-8"]]:[];
 }
 Tree.prototype.changelang = function(lang)
 {

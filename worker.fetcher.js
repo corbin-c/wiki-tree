@@ -25,6 +25,6 @@ function load(e,proxy=false)
 			xmlhttp.setRequestHeader(e.headers[i][0],e.headers[i][1]);
 		}
 	}
-	if (!proxy) { xmlhttp.withCredentials = true; }
+	//if (!proxy) { xmlhttp.withCredentials = true; }
 	xmlhttp.send();
 }

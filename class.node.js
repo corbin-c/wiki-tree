@@ -13,19 +13,18 @@ Node.prototype.load = function(type)
 	{
 		this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&cmtitle="+this.name+"&format=json&cmlimit=500&list=categorymembers";
 	}
-	this.url = (tree.cors) ? (tree.host != "file://") ? this.url+"&origin="+tree.host+"&utf8=":this.url+"&utf8=":this.url+"&utf8=";
-	this.url = (tree.cors) ? new Url(this.url,"",tree.headers):new Url(this.url,"https://cors-anywhere.herokuapp.com/",tree.headers);
+	this.url = this.url+"&origin=*&utf8";
+	this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/",tree.headers);
 	var _this = this;
 	this.url.ready(function(e) {
 		if (type == "categories")
 		{
-			_this.data(JSON.parse(e.response).query.pages[0],type);
+			_this.data(JSON.parse(e.response).query.pages,type);
 		}
 		else if (type == "categorymembers")
 		{
 			_this.data(JSON.parse(e.response).query,type);
 		}
-		_this.data(JSON.parse(e.response).query.pages[0],type);
 		_this.loaded[type] = true;
 		delete _this.url
 	});	
@@ -36,6 +35,7 @@ Node.prototype.data = function(data,type)
 	{
 		if (type == "categories")
 		{
+			data = data[Object.keys(data)[0]]
 			if (data.missing)
 			{
 				delete tree.nodes[this.name];
