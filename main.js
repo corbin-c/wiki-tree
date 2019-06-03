@@ -1,8 +1,8 @@
-tree = new Tree();
+tree = new Tree(types);
 document.getElementById("submit").addEventListener("click", function(e){
 	console.log(document.getElementById("str_search").value)		
 	tree.new_node(capital_letter(document.getElementById("str_search").value))
-	tree.load_nodes(1);
+	tree.load_nodes("categories");
 })
 function capital_letter(str) 
 {
