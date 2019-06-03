@@ -1,9 +1,10 @@
 fetcher = new Worker("worker.fetcher.js");
-function Url(url,proxy,type)
+function Url(url,proxy,headers,type)
 {
 	this.url = url;
 	this.proxy = proxy;
 	this.type = type;
+	this.headers = headers;
 	this.grab();
 }
 Url.prototype.grab = function() {
