@@ -31,44 +31,31 @@ Tree.prototype.load_nodes = function(type)
 		}
 	}
 }
-Tree.prototype.add_link = function(array)
+Tree.prototype.add_link = function(array,reverted=false)
 {
-	this.wv[array.toString()] = [true,[array[1],array[0],array[2]]];
-	if (typeof this.links[array[0][0]] !== "undefined")
+	this.wv[array.toString()] = true;
+	if (typeof this.links[array[0][0]+array[0][1]] == "undefined")
 	{
-		for (i in this.links[array[0][0]])
+		this.links[array[0][0]+array[0][1]] = [array]
+	}
+	else
+	{
+		for (i in this.links[array[0][0]+array[0][1]])
 		{
-			if (this.links[array[0][0]][i] == array)
+			if (this.links[array[0][0]+array[0][1]][i] == array)
 			{
-				this.wv[array.toString()][0] = false;
+				this.wv[array.toString()] = false;
 				break;
 			}
 		}
-	}
-	if (this.wv[array.toString()][0])
-	{
-		if (typeof this.links[this.wv[array.toString()][1][0][0]] !== "undefined")
+		if (this.wv[array.toString()])
 		{
-			for (i in this.links[this.wv[array.toString()][1][0][0]])
-			{
-				if (this.links[this.wv[array.toString()][1][0][0]][i] == array)
-				{
-					this.wv[array.toString()][0] = false;
-					break;
-				}
-			}
-		}			
-	}
-	if (this.wv[array.toString()][0])
-	{
-		if (typeof this.links[array[0][0]] === "undefined")
-		{
-			this.links[array[0][0]] = [array]
+			this.links[array[0][0]+array[0][1]].push(array);
 		}
-		else
-		{
-			this.links[array[0][0]].push(array);
-		}
+	}
+	if (!reverted)
+	{
+		this.add_link([array[1],array[0],array[2]],true)
 	}
 	delete this.wv[array.toString()];
 }

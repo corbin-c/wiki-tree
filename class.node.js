@@ -14,19 +14,10 @@ Node.prototype.load = function(type)
 		this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&cmtitle="+this.name+"&format=json&cmlimit=500&list=categorymembers";
 	}
 	this.url = this.url+"&origin=*&utf8";
-	this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/",tree.headers);
+	this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/");
 	var _this = this;
 	this.url.ready(function(e) {
-		if (type == "categories")
-		{
-			_this.data(JSON.parse(e.response).query.pages,type);
-		}
-		else if (type == "categorymembers")
-		{
-			_this.data(JSON.parse(e.response).query,type);
-		}
-		_this.loaded[type] = true;
-		delete _this.url
+		handle_links(e,_this,type,this)
 	});	
 }
 Node.prototype.data = function(data,type)
@@ -57,4 +48,25 @@ Node.prototype.data = function(data,type)
 			tree.add_link([this.name,data[type][i].title,type])
 		}
 	}
+}
+function handle_links(e,_obj,type,obj)
+{
+	obj.data = JSON.parse(e.response)
+	if (type == "categories")
+	{
+		_obj.data(obj.data.query.pages,type);
+	}
+	else if (type == "categorymembers")
+	{
+		_obj.data(obj.data.query,type);
+	}
+	if (typeof obj.data.continue !== "undefined")
+	{
+		_obj.url = new Url(obj.url+"&"+(Object.keys(obj.data.continue)[0])+"="+obj.data.continue[Object.keys(obj.data.continue)[0]],"https://cors-anywhere.herokuapp.com/");
+		_obj.url.ready(function(e) {
+			handle_links(e,_obj,type,obj)
+		});	
+	}
+	_obj.loaded[type] = true;
+	delete _obj.url
 }
