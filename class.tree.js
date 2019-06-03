@@ -1,7 +1,8 @@
-function Tree(host)
+function Tree(host,cors)
 {
 	this.host = host;
 	this.lang = "en";
+	this.cors = cors;
 	this.nodes = {};
 	this.links = {};
 	this.wv = {};

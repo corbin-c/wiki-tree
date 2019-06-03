@@ -10,12 +10,13 @@ function load(e,proxy=false)
 			e.response = xmlhttp.response;
 			postMessage(e);
 		}
-		/*else if (((this.readyState == 4) && (this.status == 0)) && ((typeof e.cors === "undefined") || (e.cors == false)))
+		else if (((this.readyState == 4) && (this.status == 0)) && ((typeof e.cors === "undefined") || (e.cors == false)))
 		{
 			e.cors = true;
 			load(e,true)
-		}*/
+		}
 	};
+	if (!proxy) { xmlhttp.withCredentials = true; }
 	xmlhttp.open("GET", url);
 	xmlhttp.send();
 }

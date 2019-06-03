@@ -13,8 +13,8 @@ Node.prototype.load = function(type)
 	{
 		this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&cmtitle="+this.name+"&format=json&cmlimit=500&list=categorymembers";
 	}
-	this.url = this.url+"&origin="+tree.host+"&utf8="
-	this.url = new Url(this.url);
+	this.url = (tree.cors) ? this.url+"&origin="+tree.host+"&utf8=":this.url+"&utf8=";
+	this.url = (tree.cors) ? new Url(this.url):new Url(this.url,"https://cors-anywhere.herokuapp.com/");
 	var _this = this;
 	this.url.ready(function(e) {
 		if (type == "categories")
