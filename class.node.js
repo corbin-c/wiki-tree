@@ -18,30 +18,37 @@ Node.prototype.load = function(type)
 	this.url.ready(function(e) {
 		if (type == "categories")
 		{
-			this.name = JSON.parse(e.response).query.pages[0].title;
 			_this.data(JSON.parse(e.response).query.pages[0],type);
 		}
 		else if (type == "categorymembers")
 		{
 			_this.data(JSON.parse(e.response).query,type);
 		}
+		_this.data(JSON.parse(e.response).query.pages[0],type);
 		_this.loaded[type] = true;
 		delete _this.url
 	});	
 }
 Node.prototype.data = function(data,type)
 {
-	if (data.missing)
+	if (typeof data !== "undefined")
 	{
-		delete tree.nodes[this.name];
-		delete this;
-	}
-	else
-	{
-		delete tree.nodes[this.name];
-		if (typeof tree.nodes[this.name] === "undefined")
+		if (type == "categories")
 		{
-			tree.nodes[this.name] = this;
+			if (data.missing)
+			{
+				delete tree.nodes[this.name];
+				delete this;
+			}
+			else
+			{
+				delete tree.nodes[this.name];
+				this.name = data.title;
+				if (typeof tree.nodes[this.name] === "undefined")
+				{
+					tree.nodes[this.name] = this;
+				}
+			}
 		}
 		for (var i in data[type])
 		{
@@ -49,8 +56,4 @@ Node.prototype.data = function(data,type)
 			tree.add_link([this.name,data[type][i].title,type])
 		}
 	}
-}
-Node.protottype.links = function(type)
-{
-	
 }
