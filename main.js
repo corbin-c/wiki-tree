@@ -1,4 +1,4 @@
-tree = new Tree(types);
+tree = new Tree(window.location.protocol+"//"+window.location.host);
 document.getElementById("submit").addEventListener("click", function(e){
 	console.log(document.getElementById("str_search").value)		
 	tree.new_node(capital_letter(document.getElementById("str_search").value))

@@ -1,5 +1,6 @@
-function Tree(types)
+function Tree(host)
 {
+	this.host = host;
 	this.lang = "en";
 	this.nodes = {};
 	this.links = {};
