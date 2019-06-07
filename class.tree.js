@@ -16,20 +16,22 @@ Tree.prototype.changelang = function(lang)
 		this.links = [];
 	}
 }
-Tree.prototype.new_node = function(str)
+Tree.prototype.new_node = function(response)
 {
-	if (typeof this.nodes[str] === "undefined")
+	if (typeof response === "string") {response = {title:response,ns:0}}
+	if (typeof this.nodes[response.title] === "undefined")
 	{
-		this.nodes[str] = new Node(str);
+		this.nodes[response.title] = new Node(response);
 	}
 }
-Tree.prototype.load_nodes = function(type)
+Tree.prototype.load_nodes = async function(type)
 {
 	for (i in this.nodes)
 	{
 		if (!this.nodes[i].loaded[type])
 		{
 			this.nodes[i].load(type);
+			await incr_wait(0,10);
 		}
 	}
 }
@@ -44,7 +46,7 @@ Tree.prototype.clean_tree = function()
 	var clean_nodes = [];
 	for (i in nodes)
 	{
-		clean_nodes.push({name:this.nodes[nodes[i]].name,id:this.nodes[nodes[i]].id})
+		clean_nodes.push({name:this.nodes[nodes[i]].name,id:this.nodes[nodes[i]].id,type:this.nodes[nodes[i]].type,size:Math.floor(Object.keys(this.nodes[nodes[i]].links).length/5)+5})
 	}
 	return {links:this.explicit_links,nodes:clean_nodes}
 }

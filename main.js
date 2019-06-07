@@ -27,7 +27,7 @@ force_graph.onmessage = function (event) {
 		.attr("y2", function(d) { return d.target.y })
 		.attr("stroke", "black")
 		.attr("stroke-width", 1.5)
-		.attr("stroke-opacity", "1")
+		.attr("stroke-opacity", "0.5")
 			
 	var node = svg_nodes.selectAll("g").data(event.data.nodes, function(d) { return d.name });
 
@@ -38,7 +38,7 @@ force_graph.onmessage = function (event) {
 	node.select("circle").style("opacity", 1).transition().duration(duration)
 		.attr("cy", function(d) { return d.y })
 		.attr("cx", function(d) { return d.x })
-		.attr("r",  5)
+		.attr("r",  function(d) { return d.size })
 
 	node.select("text")
 		.transition().duration(duration)
@@ -47,9 +47,10 @@ force_graph.onmessage = function (event) {
 		.style("opacity", 1)
 
 	nu = node.enter().append("g")
-		.attr("id",  function(d) { return "id"+d.name })
+		.attr("id",  function(d) { return "id"+d.id })
 		.attr("x", function(d) { return d.x })
 		.attr("y", function(d) { return d.y })
+		.on("click", function(d) { tree.nodes[d.name].load((d.type == '14')?"categorymembers":"categories"); })
 
 	nu.append("text")
 		.text(function(d) {	return d.name; })
@@ -60,9 +61,10 @@ force_graph.onmessage = function (event) {
 	nu.append("circle")
 		.attr("cx", function(d) { if ((typeof d.parent !== 'undefined') && (typeof d.parent !== 'boolean')) { if (typeof positions[d.parent] === 'undefined') { xorigin = d3.select("#id"+d.parent).attr("x") } else { xorigin = positions[d.parent][0] } } else { xorigin = d.x } return xorigin })
 		.attr("cy", function(d) { if ((typeof d.parent !== 'undefined') && (typeof d.parent !== 'boolean')) { if (typeof positions[d.parent] === 'undefined') { xorigin = d3.select("#id"+d.parent).attr("y") } else { xorigin = positions[d.parent][1] } } else { xorigin = d.y } return xorigin })
-		.attr("r", 5)
+		.attr("r",  function(d) { return d.size })
 		.style("opacity",0)
 		.attr("stroke", "white")
+		.attr("fill", function(d) { return (d.type==0) ? "yellow":"red"; })
 		.attr("cx", function(d) { return d.x })
 		.attr("cy", function(d) { return d.y })
 		.style("opacity", 1)
@@ -91,4 +93,13 @@ function capital_letter(str)
 	str = str.split(" ");
 	for (var i=0,x=str.length;i<x;i++) {str[i]=str[i][0].toUpperCase()+str[i].substr(1);}
 	return str.join(" ");
+}
+function incr_wait(i,t,rand=false)
+{
+	t = (rand) ? Math.floor(t+2*t*Math.random()):t;
+	return new Promise(function(resolve,reject){
+		setTimeout(function(){
+			resolve(i+1);
+		},t)
+	})
 }

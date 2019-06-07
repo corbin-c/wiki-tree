@@ -1,6 +1,7 @@
-function Node(title)
+function Node(node)
 {
-	this.name = title;
+	this.name = node.title;
+	this.type = node.ns;
 	this.links = {};
 	this.loaded = {};
 	this.id = tree.get_id();
@@ -22,7 +23,7 @@ Node.prototype.load = function(type)
 		handle_links(e,_this,type,this)
 	});	
 }
-Node.prototype.data = function(data,type)
+Node.prototype.data = async function(data,type)
 {
 	if (typeof data !== "undefined")
 	{
@@ -38,6 +39,7 @@ Node.prototype.data = function(data,type)
 			{
 				delete tree.nodes[this.name];
 				this.name = data.title;
+				this.type = data.ns;
 				if (typeof tree.nodes[this.name] === "undefined")
 				{
 					tree.nodes[this.name] = this;
@@ -46,8 +48,9 @@ Node.prototype.data = function(data,type)
 		}
 		for (var i in data[type])
 		{
-			tree.new_node(data[type][i].title)
+			tree.new_node(data[type][i])
 			tree.add_link([this.name,data[type][i].title,type])
+			await incr_wait(0,10)
 		}
 	}
 }
@@ -62,7 +65,6 @@ Node.prototype.add_link = function(linked_node,type,explicit=true)
 		{
 			var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
 			tree.explicit_links.push(link);
-			// CALL HERE FOR GRAPH
 			force_graph.postMessage({tree:tree.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height)})
 		}
 		delete link;
