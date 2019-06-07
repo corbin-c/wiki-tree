@@ -77,7 +77,7 @@ function handle_links(e,_obj,type,obj)
 	}
 	else if (type == "categorymembers")
 	{
-		_obj.data(obj.data.query,"categories");
+		_obj.data(obj.data.query,"categorymembers");
 	}
 	if (typeof obj.data.continue !== "undefined")
 	{

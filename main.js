@@ -11,7 +11,6 @@ zoom_handler(svg);
 
 force_graph.onmessage = function (event) {
 // HERE IS WHERE ACTUAL GRAPH IS DRAWN
-	console.log(event.data)
 	var duration = 100;
 	link = svg_links.selectAll("line").data(event.data.links, function(d) { return d.source.name+"-"+d.target.name; })
 	link.exit().transition().duration(duration/3).style("opacity",0).remove();
@@ -69,7 +68,7 @@ force_graph.onmessage = function (event) {
 		.style("opacity", 1)
 
 	nu.append("title")
-			.text(function(d) { return d.name; })
+		.text(function(d) { return d.name; })
 	
 	bi = node.merge(nu)
 	bi.select("text")
