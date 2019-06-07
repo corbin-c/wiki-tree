@@ -83,7 +83,9 @@ tree = new Tree();
 
 // BELOW TREE IS FED WITH USER INPUT
 document.getElementById("submit").addEventListener("click", function(e){
-	console.log(document.getElementById("str_search").value)		
+	//console.log(document.getElementById("str_search").value)
+	document.querySelector("form").setAttribute("style","display: none;");
+	document.querySelector("svg").setAttribute("style","display: block;");
 	tree.new_node(capital_letter(document.getElementById("str_search").value))
 	tree.load_nodes("categories");
 })

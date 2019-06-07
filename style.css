@@ -1,8 +1,35 @@
+section
+{
+	margin: 0;
+	padding: 0;
+	min-height: calc(100% - 220px);
+}
+header,footer
+{
+	margin:0;
+}
 svg
 {
-	display: block;
+	display: none;
 	width: 100%;
-	height: 100vh;
-	border: 1px dotted black;
-	margin-top: 20px;
+	height: calc(100vh - 110px);
+}
+form
+{
+	width: 30%;
+	position: absolute;
+	left: 35%;
+	padding-top: 25px;
+}
+form input, select
+{
+	width: calc(100% - 10px);
+	display: block;
+	padding: 5px;
+	margin: 5px;
+}
+form button
+{
+	padding: 5px;
+	margin: 5px;
 }

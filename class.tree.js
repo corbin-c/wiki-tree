@@ -9,12 +9,7 @@ function Tree()
 }
 Tree.prototype.changelang = function(lang)
 {
-	if (confirm("Changing language will erase current tree. Are you sure?"))
-	{
-		this.lang = lang;
-		this.nodes = {};
-		this.links = [];
-	}
+	this.lang = lang;
 }
 Tree.prototype.new_node = function(response)
 {
