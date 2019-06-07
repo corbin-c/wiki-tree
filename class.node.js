@@ -3,6 +3,7 @@ function Node(title)
 	this.name = title;
 	this.links = {};
 	this.loaded = {};
+	this.id = tree.get_id();
 }
 Node.prototype.load = function(type)
 {
@@ -50,12 +51,21 @@ Node.prototype.data = function(data,type)
 		}
 	}
 }
-Node.prototype.add_link = function(linked_node,type)
+Node.prototype.add_link = function(linked_node,type,explicit=true)
 {
 	if (typeof this.links[linked_node] == "undefined")
 	{
 		this.links[linked_node] = type;
-		tree.links.push([this.name,linked_node])
+		var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
+		tree.links[link.id] = link;
+		if (explicit)
+		{
+			var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
+			tree.explicit_links.push(link);
+			// CALL HERE FOR GRAPH
+			force_graph.postMessage({tree:tree.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height)})
+		}
+		delete link;
 	}
 }
 function handle_links(e,_obj,type,obj)
