@@ -1,6 +1,7 @@
 function Node(title)
 {
 	this.name = title;
+	this.links = {};
 	this.loaded = {};
 }
 Node.prototype.load = function(type)
@@ -49,6 +50,14 @@ Node.prototype.data = function(data,type)
 		}
 	}
 }
+Node.prototype.add_link = function(linked_node,type)
+{
+	if (typeof this.links[linked_node] == "undefined")
+	{
+		this.links[linked_node] = type;
+		tree.links.push([this.name,linked_node])
+	}
+}
 function handle_links(e,_obj,type,obj)
 {
 	obj.data = JSON.parse(e.response)
@@ -58,7 +67,7 @@ function handle_links(e,_obj,type,obj)
 	}
 	else if (type == "categorymembers")
 	{
-		_obj.data(obj.data.query,type);
+		_obj.data(obj.data.query,"categories");
 	}
 	if (typeof obj.data.continue !== "undefined")
 	{

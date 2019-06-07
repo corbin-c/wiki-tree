@@ -2,7 +2,7 @@ function Tree()
 {
 	this.lang = "en";
 	this.nodes = {};
-	this.links = {};
+	this.links = [];
 	this.wv = {};
 }
 Tree.prototype.changelang = function(lang)
@@ -31,31 +31,8 @@ Tree.prototype.load_nodes = function(type)
 		}
 	}
 }
-Tree.prototype.add_link = function(array,reverted=false)
+Tree.prototype.add_link = function(array)
 {
-	this.wv[array.toString()] = true;
-	if (typeof this.links[array[0][0]+array[0][1]] == "undefined")
-	{
-		this.links[array[0][0]+array[0][1]] = [array]
-	}
-	else
-	{
-		for (i in this.links[array[0][0]+array[0][1]])
-		{
-			if (this.links[array[0][0]+array[0][1]][i] == array)
-			{
-				this.wv[array.toString()] = false;
-				break;
-			}
-		}
-		if (this.wv[array.toString()])
-		{
-			this.links[array[0][0]+array[0][1]].push(array);
-		}
-	}
-	if (!reverted)
-	{
-		this.add_link([array[1],array[0],array[2]],true)
-	}
-	delete this.wv[array.toString()];
+	this.nodes[array[0]].add_link(array[1],array[2])
+	this.nodes[array[1]].add_link(array[0],array[2])
 }
