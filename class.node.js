@@ -1,6 +1,7 @@
-function Node(node)
+function Node(node,parent)
 {
 	this.name = node.title;
+	this.parent = parent;
 	this.type = node.ns;
 	this.links = {};
 	this.loaded = {};
@@ -8,53 +9,79 @@ function Node(node)
 }
 Node.prototype.load = function(type)
 {
-	if (type == "categories")
+	if (typeof this.loaded[type] === "undefined")
 	{
-		this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=categories&format=json&cllimit=500&clshow=!hidden&redirects";
+		if (type == "categories")
+		{
+			this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=categories&format=json&cllimit=500&clshow=!hidden&redirects";
+		}
+		else if (type == "categorymembers")
+		{
+			this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&cmtitle="+this.name+"&format=json&cmlimit=500&list=categorymembers";
+		}
+		else if (type == "internal_links")
+		{
+			this.url = 	"http://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=links&format=json&pllimit=500&utf8=";
+		}
+		this.url = this.url+"&origin=*&utf8";
+		this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/");
+		var _this = this;
+		this.url.ready(function(e) {
+			handle_links(e,_this,type,this)
+		});	
 	}
-	else if (type == "categorymembers")
-	{
-		this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&cmtitle="+this.name+"&format=json&cmlimit=500&list=categorymembers";
-	}
-	this.url = this.url+"&origin=*&utf8";
-	this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/");
-	var _this = this;
-	this.url.ready(function(e) {
-		handle_links(e,_this,type,this)
-	});	
 }
 Node.prototype.data = async function(data,type)
 {
 	if (typeof data !== "undefined")
 	{
-		if (type == "categories")
+		if (type == "internal_links")
 		{
 			data = data[Object.keys(data)[0]]
-			if (data.missing)
+			for (var i in data["links"])
 			{
-				delete tree.nodes[this.name];
-				delete this;
-			}
-			else
-			{
-				delete tree.nodes[this.name];
-				this.name = data.title;
-				this.type = data.ns;
-				if (typeof tree.nodes[this.name] === "undefined")
+				if (data["links"][i].ns == 0)
 				{
-					tree.nodes[this.name] = this;
+					tree.add_internal_link(data["links"][i].title,this.name)
 				}
 			}
 		}
-		for (var i in data[type])
+		else
 		{
-			tree.new_node(data[type][i])
-			tree.add_link([this.name,data[type][i].title,type])
-			await incr_wait(0,10)
+			if (type == "categories")
+			{
+				data = data[Object.keys(data)[0]]
+				if (data.missing)
+				{
+					delete tree.nodes[this.name];
+					delete this;
+				}
+				else
+				{
+					delete tree.nodes[this.name];
+					this.name = data.title;
+					this.type = data.ns;
+					if (typeof tree.nodes[this.name] === "undefined")
+					{
+						tree.nodes[this.name] = this;
+					}
+				}
+			}
+			for (var i in data[type])
+			{
+				tree.new_node(data[type][i],this.id)
+				tree.add_link([this.name,data[type][i].title,type],[parseInt(i),data[type].length])
+				//await incr_wait(0,10)
+				if (tree.nodes[data[type][i].title].type == 0)
+				{
+					tree.nodes[data[type][i].title].load("internal_links");
+				}
+			}
+			force_graph.postMessage({tree:tree.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height)})
 		}
 	}
 }
-Node.prototype.add_link = function(linked_node,type,explicit=true)
+Node.prototype.add_link = function(linked_node,type,q,explicit=true)
 {
 	if (typeof this.links[linked_node] == "undefined")
 	{
@@ -65,7 +92,10 @@ Node.prototype.add_link = function(linked_node,type,explicit=true)
 		{
 			var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
 			tree.explicit_links.push(link);
-			force_graph.postMessage({tree:tree.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height)})
+			if ((q == null) || (q[0] == q[1]-1) || (q[1] < 20) || (q[0] % Math.floor(q[1]/10) == 0))
+			{
+				force_graph.postMessage({tree:tree.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height)})
+			}
 		}
 		delete link;
 	}
@@ -73,7 +103,7 @@ Node.prototype.add_link = function(linked_node,type,explicit=true)
 function handle_links(e,_obj,type,obj)
 {
 	obj.data = JSON.parse(e.response)
-	if (type == "categories")
+	if (type == "categories" || type == "internal_links")
 	{
 		_obj.data(obj.data.query.pages,type);
 	}

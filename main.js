@@ -11,24 +11,7 @@ zoom_handler(svg);
 
 force_graph.onmessage = function (event) {
 // HERE IS WHERE ACTUAL GRAPH IS DRAWN
-	var duration = 100;
-	link = svg_links.selectAll("line").data(event.data.links, function(d) { return d.source.name+"-"+d.target.name; })
-	link.exit().transition().duration(duration/3).style("opacity",0).remove();
-	link.transition().duration(duration)
-		.attr("x1", function(d) { return d.source.x })
-		.attr("x2", function(d) { return d.target.x })
-		.attr("y1", function(d) { return d.source.y })
-		.attr("y2", function(d) { return d.target.y })
-		.attr("stroke-width", 1)
-	link.enter().append("line")
-		.attr("x1", function(d) { return d.source.x })
-		.attr("x2", function(d) { return d.target.x })
-		.attr("y1", function(d) { return d.source.y })
-		.attr("y2", function(d) { return d.target.y })
-		.attr("stroke", "black")
-		.attr("stroke-width", 1.5)
-		.attr("stroke-opacity", "0.5")
-			
+	var duration = 500;
 	var node = svg_nodes.selectAll("g").data(event.data.nodes, function(d) { return d.name });
 
 	node.exit().transition().duration(2*duration/3)
@@ -43,14 +26,14 @@ force_graph.onmessage = function (event) {
 	node.select("text")
 		.transition().duration(duration)
 		.attr("x", function(d) { return d.x - this.getComputedTextLength() / 2} )
-		.attr("y", function(d) { return d.y + 10})
+		.attr("y", function(d) { return d.y - d.size-5})
 		.style("opacity", 1)
 
 	nu = node.enter().append("g")
 		.attr("id",  function(d) { return "id"+d.id })
 		.attr("x", function(d) { return d.x })
 		.attr("y", function(d) { return d.y })
-		.on("click", function(d) { tree.nodes[d.name].load((d.type == '14')?"categorymembers":"categories"); })
+		.on("click", function(d) { console.log(d.name); tree.nodes[d.name].load((d.type == '14')?"categorymembers":"categories");})
 
 	nu.append("text")
 		.text(function(d) {	return d.name; })
@@ -59,14 +42,31 @@ force_graph.onmessage = function (event) {
 			.style("opacity",0).transition().delay(duration).duration(duration).style("opacity", 1)
 	
 	nu.append("circle")
-		.attr("cx", function(d) { if ((typeof d.parent !== 'undefined') && (typeof d.parent !== 'boolean')) { if (typeof positions[d.parent] === 'undefined') { xorigin = d3.select("#id"+d.parent).attr("x") } else { xorigin = positions[d.parent][0] } } else { xorigin = d.x } return xorigin })
-		.attr("cy", function(d) { if ((typeof d.parent !== 'undefined') && (typeof d.parent !== 'boolean')) { if (typeof positions[d.parent] === 'undefined') { xorigin = d3.select("#id"+d.parent).attr("y") } else { xorigin = positions[d.parent][1] } } else { xorigin = d.y } return xorigin })
+		.attr("cx", function(d) {
+			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
+			{
+				return document.getElementById("id"+d.parent).getElementsByTagName("circle")[0].getAttribute("cx");
+			}
+			else
+			{
+				return d.x;
+			}
+			})
+		.attr("cy", function(d) {
+			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
+			{
+				return document.getElementById("id"+d.parent).getElementsByTagName("circle")[0].getAttribute("cy");
+			}
+			else
+			{
+				return d.y;
+			}
+			})
 		.attr("r",  function(d) { return d.size })
 		.style("opacity",0)
-		.attr("stroke", "white")
-		.attr("fill", function(d) { return (d.type==0) ? "yellow":"red"; })
-		.attr("cx", function(d) { return d.x })
-		.attr("cy", function(d) { return d.y })
+		.attr("stroke-width", 2.5)
+		.attr("stroke", function(d) { return (d.type==0) ? "white":"black"; })
+		.attr("fill", function(d) { return (d.type==0) ? "black":"white"; })
 		.style("opacity", 1)
 
 	nu.append("title")
@@ -77,6 +77,60 @@ force_graph.onmessage = function (event) {
   		.text(function(d) {	return d.name})
    	bi.select("title")
    		.text(function(d) {	return d.name})
+   	
+   	link = svg_links.selectAll("line").data(event.data.links, function(d) { return d.source.name+"-"+d.target.name; })
+	link.exit().transition().duration(duration/3).style("opacity",0).remove();
+	link.enter().append("line")
+		.attr("x1", function(d) {
+			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
+			{
+				return document.getElementById("id"+d.target.parent).getElementsByTagName("circle")[0].getAttribute("cx");
+			}
+			else
+			{
+				return d.target.x;
+			}
+			})
+			.attr("y1", function(d) {
+			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
+			{
+				return document.getElementById("id"+d.target.parent).getElementsByTagName("circle")[0].getAttribute("cy");
+			}
+			else
+			{
+				return d.target.y;
+			}
+			})
+		.attr("x2", function(d) {
+			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
+			{
+				return document.getElementById("id"+d.target.parent).getElementsByTagName("circle")[0].getAttribute("cx");
+			}
+			else
+			{
+				return d.target.x;
+			}
+			})
+		.attr("y2", function(d) {
+			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
+			{
+				return document.getElementById("id"+d.target.parent).getElementsByTagName("circle")[0].getAttribute("cy");
+			}
+			else
+			{
+				return d.target.y;
+			}
+			})	
+		.attr("stroke", "black")
+		.attr("stroke-width", 2.5)
+		.attr("stroke-opacity", 1)
+	link.transition().duration(duration)
+		.attr("x1", function(d) { return d.source.x })
+		.attr("x2", function(d) { return d.target.x })
+		.attr("y1", function(d) { return d.source.y })
+		.attr("y2", function(d) { return d.target.y })
+		.attr("stroke-width", 2.5)
+			
 };
 // CONSTRUCT NEW TREE
 tree = new Tree();
