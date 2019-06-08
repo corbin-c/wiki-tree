@@ -64,7 +64,14 @@ Tree.prototype.add_internal_link = function(target,source)
 	//sinon on ajoute le lien à la liste des liens internes en attente
 	else
 	{
-		this.internal_links[target] = source;
+		try
+		{
+			this.internal_links[target].push(source);
+		}
+		catch
+		{
+			this.internal_links[target] = [source];
+		}
 	}
 }
 Tree.prototype.clean_tree = function()
