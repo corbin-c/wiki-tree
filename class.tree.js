@@ -7,6 +7,11 @@ function Tree()
 	this.internal_links = {};
 	this.wv = {};
 	this.id = 0;
+	this.focus = false;
+}
+Tree.prototype.graph = function()
+{
+	force_graph.postMessage({tree:this.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height),focus:this.focus})
 }
 Tree.prototype.changelang = function(lang)
 {
@@ -20,8 +25,11 @@ Tree.prototype.new_node = function(response,parent)
 		this.nodes[response.title] = new Node(response,parent);
 		if (typeof this.internal_links[response.title] !== "undefined")
 		{
-			this.nodes[this.internal_links[response.title]].add_link(response.title,"internal_links",null)
-			this.nodes[response.title].add_link(this.internal_links[response.title],"internal_links",null,false)
+			for (var i in this.internal_links[response.title])
+			{
+				this.nodes[this.internal_links[response.title][i]].add_link(response.title,"internal_links",null)
+				this.nodes[response.title].add_link(this.internal_links[response.title][i],"internal_links",null,false)
+			}
 		}
 	}
 }

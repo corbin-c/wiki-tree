@@ -71,13 +71,12 @@ Node.prototype.data = async function(data,type)
 			{
 				tree.new_node(data[type][i],this.id)
 				tree.add_link([this.name,data[type][i].title,type],[parseInt(i),data[type].length])
-				//await incr_wait(0,10)
 				if (tree.nodes[data[type][i].title].type == 0)
 				{
 					tree.nodes[data[type][i].title].load("internal_links");
 				}
 			}
-			force_graph.postMessage({tree:tree.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height)})
+			tree.graph();
 		}
 	}
 }
@@ -94,7 +93,7 @@ Node.prototype.add_link = function(linked_node,type,q,explicit=true)
 			tree.explicit_links.push(link);
 			if ((q == null) || (q[0] == q[1]-1) || (q[1] < 20) || (q[0] % Math.floor(q[1]/10) == 0))
 			{
-				force_graph.postMessage({tree:tree.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height)})
+				tree.graph();
 			}
 		}
 		delete link;
