@@ -6,6 +6,10 @@ function Node(node,parent)
 	this.links = {};
 	this.loaded = {};
 	this.id = tree.get_id();
+	if (this.type == 0)
+	{
+		this.load("internal_links");
+	}
 }
 Node.prototype.load = function(type)
 {
@@ -71,10 +75,6 @@ Node.prototype.data = async function(data,type)
 			{
 				tree.new_node(data[type][i],this.id)
 				tree.add_link([this.name,data[type][i].title,type],[parseInt(i),data[type].length])
-				if (tree.nodes[data[type][i].title].type == 0)
-				{
-					tree.nodes[data[type][i].title].load("internal_links");
-				}
 			}
 			tree.graph();
 		}

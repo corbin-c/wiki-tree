@@ -11,7 +11,15 @@ function Tree()
 }
 Tree.prototype.graph = function()
 {
-	force_graph.postMessage({tree:this.clean_tree(),width:Number(document.querySelector("svg").getBoundingClientRect().width),height:Number(document.querySelector("svg").getBoundingClientRect().height),focus:this.focus})
+	/*if (this.focus)
+	{
+		console.log(this.focus)
+		force_graph.postMessage({tree:this.clean_tree(),x_center:Number(document.getElementById("id"+this.focus).getElementsByTagName("circle")[0].getAttribute("cx")),y_center:Number(document.getElementById("id"+this.focus).getElementsByTagName("circle")[0].getAttribute("cy"))})
+	}
+	else
+	{*/
+		force_graph.postMessage({tree:this.clean_tree(),x_center:Number(document.querySelector("svg").getBoundingClientRect().width)/2,y_center:Number(document.querySelector("svg").getBoundingClientRect().height)/2})
+	//}
 }
 Tree.prototype.changelang = function(lang)
 {

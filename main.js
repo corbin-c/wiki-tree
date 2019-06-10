@@ -33,12 +33,13 @@ force_graph.onmessage = function (event) {
 		.attr("id",  function(d) { return "id"+d.id })
 		.attr("x", function(d) { return d.x })
 		.attr("y", function(d) { return d.y })
-		.on("click", function(d) { console.log(d.name); tree.nodes[d.name].load((d.type == '14')?"categorymembers":"categories");})
+		.on("click", function(d) { console.log(d.name); tree.focus = d.id; tree.nodes[d.name].load((d.type == '14')?"categorymembers":"categories");})
 
 	nu.append("text")
 		.text(function(d) {	return d.name; })
 			.attr("x", function(d) { return d.x - this.getComputedTextLength() / 2} )
 			.attr("y", function(d) { return d.y +10})
+			.attr("stroke", "white")
 			.style("opacity",0).transition().delay(duration).duration(duration).style("opacity", 1)
 	
 	nu.append("circle")

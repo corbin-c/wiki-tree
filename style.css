@@ -17,6 +17,9 @@ svg
 svg text
 {
 	visibility: hidden;
+	text-transform: uppercase;
+	font-size: 1.2em;
+	font-weight: bold;
 }
 .nodes g:hover *
 {
