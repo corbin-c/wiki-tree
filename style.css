@@ -28,8 +28,7 @@ svg text
 form
 {
 	width: 30%;
-	position: absolute;
-	left: 35%;
+	margin-left: 35%;
 	padding-top: 25px;
 }
 form input, select
