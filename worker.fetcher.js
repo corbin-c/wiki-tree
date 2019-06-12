@@ -6,6 +6,7 @@ function load(e,proxy=false)
 	
 	xmlhttp.responseType = e.type;
 	xmlhttp.onreadystatechange = function() {
+		console.log(this.readyState,this.status,e.cors)
 		if ((this.readyState == 4) && (this.status == 200))
 		{
 			e.response = xmlhttp.response;
