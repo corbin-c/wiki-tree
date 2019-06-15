@@ -7,6 +7,7 @@ function load(e,proxy=false)
 	
 	xmlhttp.responseType = e.type;
 	xmlhttp.onreadystatechange = function() {
+		console.log(this.readyState,this.status)
 		if (this.readyState == 4)
 		{
 			console.log(this.status,e.cors,url,proxy)
@@ -20,7 +21,7 @@ function load(e,proxy=false)
 				if ((typeof e.cors === "undefined") || (e.cors == false))
 				{
 					e.cors = true;
-					load(e,true)
+					//load(e,true)
 				}
 			}
 		}
