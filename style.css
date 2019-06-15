@@ -1,18 +1,21 @@
 section
 {
 	margin: 0;
+	background-color: #fff;
 	padding: 0;
-	min-height: calc(100% - 220px);
+	min-height: 100%;
 }
 header,footer
 {
 	margin:0;
+	display: none;
 }
 svg
 {
 	display: none;
 	width: 100%;
-	height: calc(100vh - 110px);
+	height: 100vh;
+	background-color: #fff;
 }
 svg text
 {
@@ -20,6 +23,8 @@ svg text
 	text-transform: uppercase;
 	font-size: 1.2em;
 	font-weight: bold;
+	stroke: rgb(203 201 188);
+	fill: rgb(118 143 165);
 }
 .nodes g:hover *
 {
@@ -42,4 +47,37 @@ form button
 {
 	padding: 5px;
 	margin: 5px;
+}
+line, circle
+{
+   transition: stroke 1s;
+}
+.t0, .t10, .t14
+{
+	fill: rgb(255 542 172);
+	stroke: rgb(205 218 225);
+}
+.t14
+{
+	fill: rgb(248 193 168);
+}
+line
+{
+	stroke: rgb(205 218 225);
+}
+.highlight0 .t0, .highlight0 .t14, .highlight0
+{
+	stroke: rgb(45 58 65);
+}
+.highlight1 .t0, .highlight1 .t14, .highlight1
+{
+	stroke: rgb(85 98 105);
+}
+.highlight2 .t0, .highlight2 .t14, .highlight2
+{
+	stroke: rgb(125 138 145);
+}
+.highlight3 .t0, .highlight3 .t14, .highlight3
+{
+	stroke: rgb(165 178 185);
 }

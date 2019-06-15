@@ -7,19 +7,57 @@ function Tree()
 	this.internal_links = {};
 	this.wv = {};
 	this.id = 0;
-	this.focus = false;
+	this.focal_point = false;
+}
+Tree.prototype.focus = function(name,linked={},level=0)
+{
+	if (level == 0)
+	{
+		linked[this.nodes[name].id] = 0
+		this.focal_point = name
+	}
+	level++;
+	for (i in this.nodes[name].links)
+	{
+		if ((typeof linked[this.nodes[i].id] === "undefined") || (linked[this.nodes[i].id] > level) || (typeof linked[this.nodes[name].links[i].id] === "undefined") || (linked[this.nodes[name].links[i].id] > level))
+		{
+			if ((typeof linked[this.nodes[i].id] === "undefined") || (linked[this.nodes[i].id] > level)) 
+			{
+				linked[this.nodes[i].id] = level
+			}
+			if ((typeof linked[this.nodes[name].links[i].id] === "undefined") || (linked[this.nodes[name].links[i].id] > level))
+			{
+				linked[this.nodes[name].links[i].id] = level
+			}
+			if (level < 3)
+			{
+				linked = this.focus(i,linked,level)
+			}
+		}
+	}
+	return linked;
 }
 Tree.prototype.graph = function()
 {
-	/*if (this.focus)
+	force_graph.postMessage({tree:this.clean_tree(),x_center:Number(document.querySelector("svg").getBoundingClientRect().width)/2,y_center:Number(document.querySelector("svg").getBoundingClientRect().height)/2})
+	/*if (tree.focal_point)
 	{
-		console.log(this.focus)
-		force_graph.postMessage({tree:this.clean_tree(),x_center:Number(document.getElementById("id"+this.focus).getElementsByTagName("circle")[0].getAttribute("cx")),y_center:Number(document.getElementById("id"+this.focus).getElementsByTagName("circle")[0].getAttribute("cy"))})
-	}
-	else
-	{*/
-		force_graph.postMessage({tree:this.clean_tree(),x_center:Number(document.querySelector("svg").getBoundingClientRect().width)/2,y_center:Number(document.querySelector("svg").getBoundingClientRect().height)/2})
-	//}
+	links = tree.focus(tree.focal_point);
+		//g.attr("style", function() { return "transform-origin: "+document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cx")+" "+document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cy")+" 0;";});
+		svg_nodes.selectAll("g").attr("class","")
+		svg_links.selectAll("line").attr("class","")
+		for (i in links)
+		{
+			try
+			{
+				document.getElementById("id"+i).classList.add("highlight"+links[i]);
+			}
+			catch
+			{
+				console.log("id"+i)
+			}
+		}
+	}*/
 }
 Tree.prototype.changelang = function(lang)
 {
@@ -35,8 +73,8 @@ Tree.prototype.new_node = function(response,parent)
 		{
 			for (var i in this.internal_links[response.title])
 			{
-				this.nodes[this.internal_links[response.title][i]].add_link(response.title,"internal_links",null)
-				this.nodes[response.title].add_link(this.internal_links[response.title][i],"internal_links",null,false)
+				this.nodes[response.title].add_link(this.internal_links[response.title][i],"internal_links",null,this.nodes[this.internal_links[response.title][i]].add_link(response.title,"internal_links",null)
+)
 			}
 		}
 	}
@@ -54,8 +92,7 @@ Tree.prototype.load_nodes = async function(type)
 }
 Tree.prototype.add_link = function(array,queue)
 {
-	this.nodes[array[0]].add_link(array[1],array[2],queue)
-	this.nodes[array[1]].add_link(array[0],array[2],queue,false)
+	this.nodes[array[1]].add_link(array[0],array[2],queue,this.nodes[array[0]].add_link(array[1],array[2],queue))
 }
 Tree.prototype.add_internal_link = function(target,source)
 {
@@ -63,8 +100,7 @@ Tree.prototype.add_internal_link = function(target,source)
 	if (typeof this.nodes[target] !== "undefined")
 	{
 		//console.log("node found")
-		this.nodes[source].add_link(target,"internal_links",null)
-		this.nodes[target].add_link(source,"internal_links",null,false)
+		this.nodes[target].add_link(source,"internal_links",null,this.nodes[source].add_link(target,"internal_links",null))
 	}
 	//sinon, on vérifie si target est déjà présent dans les liens internes, et auquel cas le lien est validé aussi
 	/*else if (typeof this.internal_links[target] !== "undefined")

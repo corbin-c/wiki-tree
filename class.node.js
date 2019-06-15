@@ -25,7 +25,7 @@ Node.prototype.load = function(type)
 		}
 		else if (type == "internal_links")
 		{
-			this.url = 	"http://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=links&format=json&pllimit=500&utf8=";
+			this.url = 	"http://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=links&format=json&pllimit=500";
 		}
 		this.url = this.url+"&origin=*&utf8";
 		this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/");
@@ -84,19 +84,28 @@ Node.prototype.add_link = function(linked_node,type,q,explicit=true)
 {
 	if (typeof this.links[linked_node] == "undefined")
 	{
-		this.links[linked_node] = type;
 		var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
+		this.links[linked_node] = {type:type};
 		tree.links[link.id] = link;
-		if (explicit)
+		if (explicit === true)
 		{
 			var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
 			tree.explicit_links.push(link);
+			this.links[linked_node].id = link.id;
 			if ((q == null) || (q[0] == q[1]-1) || (q[1] < 20) || (q[0] % Math.floor(q[1]/10) == 0))
 			{
 				tree.graph();
 			}
 		}
-		delete link;
+		else if (explicit !== false)
+		{
+			this.links[linked_node].id = explicit;
+		}
+		return link.id
+	}
+	else
+	{
+		return false;
 	}
 }
 function handle_links(e,_obj,type,obj)
