@@ -8,7 +8,7 @@ function load(e,proxy=false)
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4)
 		{
-			console.log(this.readyState,this.status,e.cors,url)
+			console.log(this.status,e.cors,url,proxy)
 			if (this.status == 200)
 			{
 				e.response = xmlhttp.response;
