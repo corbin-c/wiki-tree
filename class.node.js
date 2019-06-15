@@ -25,7 +25,7 @@ Node.prototype.load = function(type)
 		}
 		else if (type == "internal_links")
 		{
-			this.url = 	"http://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=links&format=json&pllimit=500";
+			this.url = 	"https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=links&format=json&pllimit=500";
 		}
 		this.url = this.url+"&origin=*&utf8";
 		this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/");
