@@ -2,15 +2,12 @@ onmessage = function(e) { load(e.data) }
 function load(e,proxy=false)
 {
 	var url = (proxy) ? e.proxy+e.url:e.url;
-	console.log(e,proxy,url)
 	var xmlhttp = new XMLHttpRequest();
 	
 	xmlhttp.responseType = e.type;
 	xmlhttp.onreadystatechange = function() {
-		console.log(this.readyState,this.status)
 		if (this.readyState == 4)
 		{
-			console.log(this.status,e.cors,url,proxy)
 			if (this.status == 200)
 			{
 				e.response = xmlhttp.response;
@@ -21,7 +18,7 @@ function load(e,proxy=false)
 				if ((typeof e.cors === "undefined") || (e.cors == false))
 				{
 					e.cors = true;
-					//load(e,true)
+					load(e,true)
 				}
 			}
 		}
