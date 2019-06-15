@@ -1,4 +1,4 @@
-async function Node(node,parent)
+function Node(node,parent)
 {
 	this.name = node.title;
 	this.parent = parent;
@@ -8,7 +8,6 @@ async function Node(node,parent)
 	this.id = tree.get_id();
 	if (this.type == 0)
 	{
-		await incr_wait(0,500,true);
 		this.load("internal_links");
 	}
 }
