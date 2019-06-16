@@ -54,12 +54,12 @@ line, circle
 }
 .t0, .t10, .t14
 {
-	fill: #FFAA33;
+	fill: #33AAFF;
 	stroke: white;
 }
 .t14
 {
-	fill: #33AAFF;
+	fill: #FFAA33;
 }
 line
 {
