@@ -5,8 +5,12 @@ function zoom_actions(){
 }
 var svg = d3.select("svg")
 var g = svg.append("g").attr("class", "everything");
-var svg_links = g.append("g").attr("class", "links")
-var svg_nodes = g.append("g").attr("class", "nodes")
+var h = g.append("g");
+var svg_nodes2 = h.append("g").attr("class", "backnodes")
+var svg_links = h.append("g").attr("class", "links")
+var svg_nodes = h.append("g").attr("class", "nodes")
+var f_x = 0;
+var f_y = 0;
 var force_graph = new Worker('worker.force.js');
 var zoom_handler = d3.zoom().on("zoom", zoom_actions);
 //zoom_handler(svg);
@@ -14,17 +18,37 @@ svg.call(zoom_handler)
 
 force_graph.onmessage = function (event) {
 // HERE IS WHERE ACTUAL GRAPH IS DRAWN
-	var duration = 500;
+	var duration = 220;
+	/*if (document.querySelector("#id"+tree.focal_point+" circle") !== null)
+	{
+		f_x = document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cx");
+		f_y = document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cy");
+		x=Number(document.querySelector("svg").getBoundingClientRect().width)/2
+		y=Number(document.querySelector("svg").getBoundingClientRect().height)/2
+		console.log(x,f_x,f_x-x)
+		h.transition().duration(duration)
+			.attr("transform", function () { return "translate("+(x-f_x)+","+(y-f_y)+")"; })
+	}*/
+	var node2 = svg_nodes2.selectAll("g").data(event.data.nodes, function(d) { return d.name });
 	var node = svg_nodes.selectAll("g").data(event.data.nodes, function(d) { return d.name });
 
-	node.exit().transition().duration(2*duration/3)
+	node.exit().transition().duration(duration)
 		.style("opacity",0)
 		.remove();
 
-	node.select("circle").style("opacity", 1).transition().duration(duration)
+	node.select("circle").transition().duration(duration)
 		.attr("cy", function(d) { return d.y })
 		.attr("cx", function(d) { return d.x })
 		.attr("r",  function(d) { return d.size })
+		
+	node2.exit().transition().duration(duration)
+		.style("opacity",0)
+		.remove();
+
+	node2.select("circle").transition().duration(duration)
+		.attr("cy", function(d) { return d.y })
+		.attr("cx", function(d) { return d.x })
+		.attr("r",  function(d) { return d.size+4 })
 
 	node.select("text")
 		.transition().duration(duration)
@@ -54,6 +78,11 @@ force_graph.onmessage = function (event) {
 				}
 			}
 			})
+	nu2 = node2.enter().append("g")
+		.attr("id",  function(d) { return "id2"+d.id })
+		.attr("x", function(d) { return d.x })
+		.attr("y", function(d) { return d.y })
+
 
 	nu.append("text")
 		.text(function(d) {	return d.name; })
@@ -82,22 +111,54 @@ force_graph.onmessage = function (event) {
 			}
 			})
 		.attr("r",  function(d) { return d.size })
-		.attr("stroke-width", 2.5)
+		.attr("stroke-width", 2)
 		.attr("class", function(d) { return "t"+d.type; })
-		/*.attr("stroke", function(d) { return (d.type==0) ? "white":"black"; })
-		.attr("fill", function(d) { return (d.type==0) ? "black":"white"; })*/
 
 	nu.append("title")
 		.text(function(d) { return d.name; })
-	
+		
+	nu2.append("circle")
+		.attr("cx", function(d) {
+			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
+			{
+				return document.getElementById("id"+d.parent).getElementsByTagName("circle")[0].getAttribute("cx");
+			}
+			else
+			{
+				return d.x;
+			}
+			})
+		.attr("cy", function(d) {
+			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
+			{
+				return document.getElementById("id"+d.parent).getElementsByTagName("circle")[0].getAttribute("cy");
+			}
+			else
+			{
+				return d.y;
+			}
+			})
+		.attr("r",  function(d) { return d.size + 4 })
+		.attr("stroke-width", 0)
+		.attr("class", "bt")
+
+	nu2.append("title")
+		.text(function(d) { return d.name; })
+			
 	bi = node.merge(nu)
 	bi.select("text")
-  		.text(function(d) {	return d.name})
-   	bi.select("title")
-   		.text(function(d) {	return d.name})
-   	
-   	link = svg_links.selectAll("line").data(event.data.links, function(d) { return d.source.name+"-"+d.target.name; })
-	link.exit().transition().duration(duration/3).style("opacity",0).remove();
+		.text(function(d) {	return d.name})
+	bi.select("title")
+		.text(function(d) {	return d.name})
+	
+	bi2 = node.merge(nu2)
+	bi2.select("text")
+		.text(function(d) {	return d.name})
+	bi2.select("title")
+		.text(function(d) {	return d.name})
+	
+	link = svg_links.selectAll("line").data(event.data.links, function(d) { return d.source.name+"-"+d.target.name; })
+	link.exit().transition().duration(duration).style("opacity",0).remove();
 	link.enter().append("line")
 		.attr("x1", function(d) { 
 			if ((typeof d.target.parent !== 'undefined') && (document.getElementById("id"+d.target.parent) !== 'null'))
@@ -141,14 +202,14 @@ force_graph.onmessage = function (event) {
 			})
 		.attr("id", function(d) { return "id"+d.id })	
 		.attr("stroke", "black")
-		.attr("stroke-width", 2.5)
+		.attr("stroke-width", 3)
 	link.transition().duration(duration)
 		.attr("x1", function(d) { return d.source.x })
 		.attr("x2", function(d) { return d.target.x })
 		.attr("y1", function(d) { return d.source.y })
 		.attr("y2", function(d) { return d.target.y })
-		.attr("stroke-width", 2.5)
-			
+		.attr("stroke-width", 3)
+		
 };
 // CONSTRUCT NEW TREE
 tree = new Tree();

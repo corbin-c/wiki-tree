@@ -3,6 +3,7 @@ function Node(node,parent)
 	this.name = node.title;
 	this.parent = parent;
 	this.type = node.ns;
+	this.size = 7;
 	this.links = {};
 	this.loaded = {};
 	this.id = tree.get_id();
@@ -74,13 +75,13 @@ Node.prototype.data = async function(data,type)
 			for (var i in data[type])
 			{
 				tree.new_node(data[type][i],this.id)
-				tree.add_link([this.name,data[type][i].title,type],[parseInt(i),data[type].length])
+				tree.add_link([this.name,data[type][i].title,type])
 			}
-			tree.graph();
+			tree.graph()
 		}
 	}
 }
-Node.prototype.add_link = function(linked_node,type,q,explicit=true)
+Node.prototype.add_link = function(linked_node,type,explicit=true)
 {
 	if (typeof this.links[linked_node] == "undefined")
 	{
@@ -92,10 +93,22 @@ Node.prototype.add_link = function(linked_node,type,q,explicit=true)
 			var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
 			tree.explicit_links.push(link);
 			this.links[linked_node].id = link.id;
-			if ((q == null) || (q[0] == q[1]-1) || (q[1] < 20) || (q[0] % Math.floor(q[1]/10) == 0))
+			if (this.type == 0)
 			{
-				tree.graph();
+				if (tree.nodes[linked_node].type == 0)
+				{
+					this.size++;
+				}
+				else
+				{
+					this.size = this.size+0.1
+				}
 			}
+			else
+			{
+				this.size = this.size+0.1
+			}
+			tree.graph()
 		}
 		else if (explicit !== false)
 		{
@@ -126,6 +139,9 @@ function handle_links(e,_obj,type,obj)
 			handle_links(e,_obj,type,obj)
 		});	
 	}
-	_obj.loaded[type] = true;
+	else
+	{
+		_obj.loaded[type] = true;
+	}
 	delete _obj.url
 }

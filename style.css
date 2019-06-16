@@ -3,12 +3,11 @@ section
 	margin: 0;
 	background-color: #fff;
 	padding: 0;
-	min-height: 100%;
+	min-height: calc(100% - 200px);
 }
 header,footer
 {
 	margin:0;
-	display: none;
 }
 svg
 {
@@ -23,8 +22,9 @@ svg text
 	text-transform: uppercase;
 	font-size: 1.2em;
 	font-weight: bold;
-	stroke: rgb(203 201 188);
-	fill: rgb(118 143 165);
+	stroke: #5c5c5c;
+	fill: #33AAFF;
+	stroke-width: 1.5;
 }
 .nodes g:hover *
 {
@@ -54,30 +54,35 @@ line, circle
 }
 .t0, .t10, .t14
 {
-	fill: rgb(255 542 172);
-	stroke: rgb(205 218 225);
+	fill: #FFAA33;
+	stroke: white;
 }
 .t14
 {
-	fill: rgb(248 193 168);
+	fill: #33AAFF;
 }
 line
 {
-	stroke: rgb(205 218 225);
+	stroke: #5f5f5c;
 }
-.highlight0 .t0, .highlight0 .t14, .highlight0
+.highlight0 .t0, .highlight0 .t14, .highlight1
 {
-	stroke: rgb(45 58 65);
+	stroke: #5f5f5c;
 }
-.highlight1 .t0, .highlight1 .t14, .highlight1
+.bt
 {
-	stroke: rgb(85 98 105);
+	stroke: #5f5f5c;
+	fill: #5f5f5c;
+}
+/*.highlight1 .t0, .highlight1 .t14, .highlight1
+{
+	stroke: rgb(105 118 125);
 }
 .highlight2 .t0, .highlight2 .t14, .highlight2
 {
-	stroke: rgb(125 138 145);
+	stroke: rgb(165 178 185);
 }
 .highlight3 .t0, .highlight3 .t14, .highlight3
 {
-	stroke: rgb(165 178 185);
-}
+	stroke: rgb(225 238 245);
+}*/
