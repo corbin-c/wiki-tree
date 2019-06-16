@@ -5,17 +5,18 @@ function zoom_actions(){
 }
 var svg = d3.select("svg")
 var g = svg.append("g").attr("class", "everything");
-var h = g.append("g");
+var h = g.append("g").attr("class", "main_container");;
 var svg_nodes2 = h.append("g").attr("class", "backnodes")
 var svg_links = h.append("g").attr("class", "links")
 var svg_nodes = h.append("g").attr("class", "nodes")
 var f_x = 0;
 var f_y = 0;
+var display_state = {state:0,id:0};
 var force_graph = new Worker('worker.force.js');
 var zoom_handler = d3.zoom().on("zoom", zoom_actions);
 //zoom_handler(svg);
 svg.call(zoom_handler)
-
+document.querySelector("#info_tile").addEventListener("click",function (e) {document.querySelector("#focus_text").remove();e.target.classList.remove("visible");display_state.state = 0;} )
 force_graph.onmessage = function (event) {
 // HERE IS WHERE ACTUAL GRAPH IS DRAWN
 	var duration = 220;
@@ -61,22 +62,7 @@ force_graph.onmessage = function (event) {
 		.attr("y", function(d) { return d.y })
 		.on("click", function(d) {
 			console.log(d.name);
-			tree.nodes[d.name].load((d.type == '14')?"categorymembers":"categories");
-			links = tree.focus(d.name);
-			//g.attr("style", function() { return "transform-origin: "+document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cx")+" "+document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cy")+" 0;";});
-			svg_nodes.selectAll("g").attr("class","")
-			svg_links.selectAll("line").attr("class","")
-			for (i in links)
-			{
-				try
-				{
-					document.getElementById("id"+i).classList.add("highlight"+links[i]);
-				}
-				catch
-				{
-					console.log("id"+i)
-				}
-			}
+			display(d);
 			})
 	nu2 = node2.enter().append("g")
 		.attr("id",  function(d) { return "id2"+d.id })
@@ -237,4 +223,74 @@ function incr_wait(i,t,rand=false)
 			resolve(i+1);
 		},t)
 	})
+}
+
+function display(node)
+{
+	//tree.nodes[node.name].load((node.type == '14')?"categorymembers":"categories");
+	if (display_state.state == 0)
+	{
+		var cloned = document.querySelector("#id"+node.id+" text").cloneNode(true)
+		try
+		{
+			document.querySelector(".track").classList.remove("track");
+		}
+		catch
+		{
+			{}
+		}
+		cloned.setAttribute("id","focus_text")
+		document.querySelector(".main_container").append(cloned)
+		display_state.state = 1;
+		display_state.id = node.id;
+	}
+	else if (display_state.state == 1)
+	{
+		if (display_state.id != node.id)
+		{
+			document.querySelector("#focus_text").remove();
+			display_state.state = 0;
+			display(node)
+		}
+		else
+		{
+			document.querySelector("#info_tile").classList.add("visible");
+			display_state.state = 2;
+			document.querySelector("#info_tile").innerHTML = node.name;
+			//tree.nodes[node.name].load((node.type == '14')?"categorymembers":"categories");
+		}
+	}
+	else
+	{
+		if (display_state.id == node.id)
+		{
+			document.querySelector("#focus_text").remove();
+			document.querySelector("#info_tile").classList.remove("visible");
+			document.querySelector("#id"+node.id+" text").classList.add("track");
+			tree.nodes[node.name].load((node.type == '14')?"categorymembers":"categories");
+			display_state.state = 0;
+		}
+		else
+		{
+			document.querySelector("#focus_text").remove();
+			document.querySelector("#info_tile").classList.remove("visible");
+			display_state.state = 0;
+			display(node)
+		}
+	}
+	/*links = tree.focus(node.name);
+	//g.attr("style", function() { return "transform-origin: "+document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cx")+" "+document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cy")+" 0;";});
+	svg_nodes.selectAll("g").attr("class","")
+	svg_links.selectAll("line").attr("class","")
+	for (i in links)
+	{
+		try
+		{
+			document.getElementById("id"+i).classList.add("highlight"+links[i]);
+		}
+		catch
+		{
+			console.log("id"+i)
+		}
+	}*/
 }
