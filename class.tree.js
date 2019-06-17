@@ -55,7 +55,16 @@ Tree.prototype.new_node = function(response,parent)
 		{
 			for (var i in this.internal_links[response.title])
 			{
-				this.nodes[response.title].add_link(this.internal_links[response.title][i],"internal_links",this.nodes[this.internal_links[response.title][i]].add_link(response.title,"internal_links"))
+				try
+				{
+					this.nodes[response.title].add_link(this.internal_links[response.title][i],"internal_links",this.nodes[this.internal_links[response.title][i]].add_link(response.title,"internal_links"))
+				}
+				catch
+				{
+					console.log("Couldn't create link from "+response.title+" to "+this.internal_links[response.title][i]+".")
+				//	console.log(response.title, typeof tree.nodes[response.title])
+				//	console.log(this.internal_links[response.title][i],typeof tree.nodes[this.internal_links[response.title][i]])
+				}
 			}
 		}
 	}

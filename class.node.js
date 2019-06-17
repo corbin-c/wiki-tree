@@ -18,7 +18,11 @@ Node.prototype.load = function(type)
 	{
 		if (type == "categories")
 		{
-			this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=categories&format=json&cllimit=500&clshow=!hidden&redirects";
+			this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=categories&format=json&cllimit=500&clshow=!hidden";
+		}
+		else if (type == "abstract")
+		{
+			this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&prop=extracts&titles="+this.name+"&exintro=true&exlimit=1&format=json"
 		}
 		else if (type == "categorymembers")
 		{
@@ -28,12 +32,16 @@ Node.prototype.load = function(type)
 		{
 			this.url = 	"https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=links&format=json&pllimit=500";
 		}
-		this.url = this.url+"&origin=*&utf8";
+		this.url = this.url+"&redirects&origin=*&utf8";
 		this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/");
 		var _this = this;
 		this.url.ready(function(e) {
 			handle_links(e,_this,type,this)
 		});	
+	}
+	else if (type == "abstract")
+	{
+		infobox(this.abstract,this.id);
 	}
 }
 Node.prototype.data = async function(data,type)
@@ -50,6 +58,11 @@ Node.prototype.data = async function(data,type)
 					tree.add_internal_link(data["links"][i].title,this.name)
 				}
 			}
+		}
+		else if (type == "abstract")
+		{
+			this.abstract = data[Object.keys(data)[0]].extract;
+			infobox(this.abstract,this.id)
 		}
 		else
 		{
@@ -124,7 +137,7 @@ Node.prototype.add_link = function(linked_node,type,explicit=true)
 function handle_links(e,_obj,type,obj)
 {
 	obj.data = JSON.parse(e.response)
-	if (type == "categories" || type == "internal_links")
+	if (type == "categories" || type == "internal_links" || type == "abstract")
 	{
 		_obj.data(obj.data.query.pages,type);
 	}

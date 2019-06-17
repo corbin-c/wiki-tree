@@ -16,7 +16,7 @@ var force_graph = new Worker('worker.force.js');
 var zoom_handler = d3.zoom().on("zoom", zoom_actions);
 //zoom_handler(svg);
 svg.call(zoom_handler)
-document.querySelector("#info_tile").addEventListener("click",function (e) {document.querySelector("#focus_text").remove();e.target.classList.remove("visible");display_state.state = 0;} )
+document.querySelector("#info_tile").addEventListener("click",function (e) {document.querySelector("#focus_text").remove();document.querySelector("#info_tile").classList.remove("visible");display_state.state = 0;} )
 force_graph.onmessage = function (event) {
 // HERE IS WHERE ACTUAL GRAPH IS DRAWN
 	var duration = 220;
@@ -224,7 +224,15 @@ function incr_wait(i,t,rand=false)
 		},t)
 	})
 }
-
+function infobox(content,id)
+{
+	if (display_state.id == id)
+	{ 
+		var abstract = document.createElement("article");
+		document.querySelector("#info_tile").append(abstract);
+		abstract.innerHTML += content;
+	}
+}
 function display(node)
 {
 	//tree.nodes[node.name].load((node.type == '14')?"categorymembers":"categories");
@@ -256,7 +264,8 @@ function display(node)
 		{
 			document.querySelector("#info_tile").classList.add("visible");
 			display_state.state = 2;
-			document.querySelector("#info_tile").innerHTML = node.name;
+			document.querySelector("#info_tile").innerHTML = "<h3>"+node.name+"</h3>";
+			tree.nodes[node.name].load("abstract");
 			//tree.nodes[node.name].load((node.type == '14')?"categorymembers":"categories");
 		}
 	}
