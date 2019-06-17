@@ -2,8 +2,8 @@ section
 {
 	margin: 0;
 	background-color: #fff;
+	height: calc(100vh - 160px);
 	padding: 0;
-	min-height: calc(100% - 200px);
 }
 header,footer
 {
@@ -13,7 +13,7 @@ svg
 {
 	display: none;
 	width: 100%;
-	height: 100vh;
+	height: calc(100vh - 160px);
 	background-color: #fff;
 }
 svg text
@@ -84,18 +84,25 @@ line
 #info_tile
 {
 	position: absolute;
-	top: 30%;
-	height: 50vh;
-	width: 30%;
+	bottom: 130px;
+	height: calc(50vh - 130px);
+	width: calc(100% - 40px);
 	padding: 10px;
 	border: 4px solid #5F5F5C;
 	left: -100%;
 	transition: left 1s;
 }
+@media only screen and (min-width: 900px)
+{
+	#info_tile
+	{
+		width: 30%;
+	}
+}
 #info_tile.visible
 {
 	position: absolute;
-	left: 5%;
+	left: 20px;
 }
 /*.highlight1 .t0, .highlight1 .t14, .highlight1
 {
