@@ -84,11 +84,13 @@ line
 #info_tile
 {
 	position: absolute;
-	bottom: 130px;
-	height: calc(50vh - 130px);
+	bottom: 100px;
+	height: calc(50vh - 100px);
 	width: calc(100% - 40px);
 	padding: 10px;
 	border: 4px solid #5F5F5C;
+	background-color: #ececec;
+	opacity: 0.8;
 	left: -100%;
 	transition: left 1s;
 }
