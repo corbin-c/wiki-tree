@@ -1,6 +1,7 @@
 // D3 JS INIT
 function zoom_actions(){
 	var transform = d3.event.transform;
+	zoom = transform;
 	g.attr("transform", transform)
 }
 var svg = d3.select("svg")
@@ -11,14 +12,64 @@ var svg_links = h.append("g").attr("class", "links")
 var svg_nodes = h.append("g").attr("class", "nodes")
 var f_x = 0;
 var f_y = 0;
+var zoom = {};
 var display_state = {state:0,id:0};
 var force_graph = new Worker('worker.force.js');
 var zoom_handler = d3.zoom().on("zoom", zoom_actions);
 //zoom_handler(svg);
 svg.call(zoom_handler)
 document.querySelector("#info_tile").addEventListener("click",function (e) {document.querySelector("#focus_text").remove();document.querySelector("#info_tile").classList.remove("visible");display_state.state = 0;} )
+// CONSTRUCT NEW TREE
+tree = new Tree();
 force_graph.onmessage = function (event) {
-// HERE IS WHERE ACTUAL GRAPH IS DRAWN
+	delete tree.pending_ops[event.data.id]
+	if (Object.keys(tree.pending_ops).length >= 1)
+	{
+		tree.graph(true,false);
+		tree.pending_ops = {};
+	}
+	d3_graph(event);
+};
+// BELOW TREE IS FED WITH USER INPUT
+document.getElementById("submit").addEventListener("click", async function(e){
+	//console.log(document.getElementById("str_search").value)
+	document.querySelector("form").setAttribute("style","opacity: 0;");
+	document.querySelector("svg").setAttribute("style","visibility:hidden; display: block;");
+	document.querySelector("#foot_menu").setAttribute("style","display: flex;");
+	tree.new_node(capital_letter(document.getElementById("str_search").value))
+	labels = document.getElementById("foot_menu").querySelectorAll("label")
+	for (i in [...labels])
+	{
+		labels[i].addEventListener("click", function (e) { e.target.nextSibling.classList.toggle("visible"); })
+	}
+	document.getElementById("k_factor").addEventListener("change", function(e){
+		tree.graph(true,true,Number(e.target.value))
+	})
+	svg.call(zoom_handler.transform, d3.zoomIdentity
+		.translate(-Number(document.querySelector("svg").getBoundingClientRect().width)*200,-Number(document.querySelector("svg").getBoundingClientRect().height)*200)
+		.scale(400)
+		);
+	tree.load_nodes("categories");
+})
+
+function capital_letter(str) 
+{
+	str = str.split(" ");
+	for (var i=0,x=str.length;i<x;i++) {str[i]=str[i][0].toUpperCase()+str[i].substr(1);}
+	return str.join(" ");
+}
+function incr_wait(i,t,rand=false)
+{
+	t = (rand) ? Math.floor(t+2*t*Math.random()):t;
+	return new Promise(function(resolve,reject){
+		setTimeout(function(){
+			resolve(i+1);
+		},t)
+	})
+}
+function d3_graph(event)
+{
+	// HERE IS WHERE ACTUAL GRAPH IS DRAWN
 	var duration = 220;
 	/*if (document.querySelector("#id"+tree.focal_point+" circle") !== null)
 	{
@@ -53,7 +104,7 @@ force_graph.onmessage = function (event) {
 
 	node.select("text")
 		.transition().duration(duration)
-		.attr("x", function(d) { return d.x - this.getComputedTextLength() / 2} )
+		.attr("x", function(d) { return d.x - d.name.length*7.25 } )
 		.attr("y", function(d) { return d.y - d.size-5})
 
 	nu = node.enter().append("g")
@@ -70,13 +121,18 @@ force_graph.onmessage = function (event) {
 		.attr("y", function(d) { return d.y })
 
 
-	nu.append("text")
-		.text(function(d) {	return d.name; })
-			.attr("x", function(d) { return d.x - this.getComputedTextLength() / 2} )
-			.attr("y", function(d) { return d.y +10})
-	
 	nu.append("circle")
 		.attr("cx", function(d) {
+			if (d.id == 1)
+			{
+				svg.transition().duration(1000)
+					.call(zoom_handler.transform, d3.zoomIdentity
+					.scale(1)
+					.translate(0,0)
+					)
+					.attr("style","background-color:white;visibility:visible; display: block;");
+				document.querySelector("form").setAttribute("style","display:none;");
+			}
 			if ((typeof d.parent !== 'undefined') && (document.getElementById("id"+d.parent) !== 'null'))
 			{
 				return document.getElementById("id"+d.parent).getElementsByTagName("circle")[0].getAttribute("cx");
@@ -96,10 +152,20 @@ force_graph.onmessage = function (event) {
 				return d.y;
 			}
 			})
-		.attr("r",  function(d) { return d.size })
+		.attr("r", function(d) {return d.size;})
 		.attr("stroke-width", 2)
 		.attr("class", function(d) { return "t"+d.type; })
+		.transition().duration(duration)
+			.attr("cx", function(d) { return d.x; })
+			.attr("cy", function(d) { return d.y; })
 
+
+	nu.append("text")
+		.text(function(d) {	return d.name; })
+			.attr("x", function(d) { return d.x - d.name.length*7.25 } )
+			.attr("y", function(d) { return d.y - d.size-5})
+	
+			
 	nu.append("title")
 		.text(function(d) { return d.name; })
 		
@@ -127,6 +193,9 @@ force_graph.onmessage = function (event) {
 		.attr("r",  function(d) { return d.size + 4 })
 		.attr("stroke-width", 0)
 		.attr("class", "bt")
+		.transition().duration(duration)
+			.attr("cx", function(d) { return d.x; })
+			.attr("cy", function(d) { return d.y; })
 
 	nu2.append("title")
 		.text(function(d) { return d.name; })
@@ -189,40 +258,18 @@ force_graph.onmessage = function (event) {
 		.attr("id", function(d) { return "id"+d.id })	
 		.attr("stroke", "black")
 		.attr("stroke-width", 3)
+		.transition().duration(duration)
+			.attr("x1", function(d) { return d.source.x })
+			.attr("x2", function(d) { return d.target.x })
+			.attr("y1", function(d) { return d.source.y })
+			.attr("y2", function(d) { return d.target.y })
+		
 	link.transition().duration(duration)
 		.attr("x1", function(d) { return d.source.x })
 		.attr("x2", function(d) { return d.target.x })
 		.attr("y1", function(d) { return d.source.y })
 		.attr("y2", function(d) { return d.target.y })
 		.attr("stroke-width", 3)
-		
-};
-// CONSTRUCT NEW TREE
-tree = new Tree();
-
-// BELOW TREE IS FED WITH USER INPUT
-document.getElementById("submit").addEventListener("click", function(e){
-	//console.log(document.getElementById("str_search").value)
-	document.querySelector("form").setAttribute("style","display: none;");
-	document.querySelector("svg").setAttribute("style","display: block;");
-	tree.new_node(capital_letter(document.getElementById("str_search").value))
-	tree.load_nodes("categories");
-})
-
-function capital_letter(str) 
-{
-	str = str.split(" ");
-	for (var i=0,x=str.length;i<x;i++) {str[i]=str[i][0].toUpperCase()+str[i].substr(1);}
-	return str.join(" ");
-}
-function incr_wait(i,t,rand=false)
-{
-	t = (rand) ? Math.floor(t+2*t*Math.random()):t;
-	return new Promise(function(resolve,reject){
-		setTimeout(function(){
-			resolve(i+1);
-		},t)
-	})
 }
 function infobox(content,id)
 {

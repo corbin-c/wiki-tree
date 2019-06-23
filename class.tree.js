@@ -6,7 +6,7 @@ function Tree()
 	this.explicit_links = [];
 	this.internal_links = {};
 	this.id = 0;
-	this.pending_ops = 0;
+	this.pending_ops = {};
 	this.focal_point = 1;
 }
 Tree.prototype.focus = function(name,linked={},level=0)
@@ -37,9 +37,23 @@ Tree.prototype.focus = function(name,linked={},level=0)
 	}
 	return linked;
 }
-Tree.prototype.graph = function()
+Tree.prototype.graph = function(force=false,new_op=true,parameters=false)
 {
-	force_graph.postMessage({tree:this.clean_tree(),x_center:Number(document.querySelector("svg").getBoundingClientRect().width)/2,y_center:Number(document.querySelector("svg").getBoundingClientRect().height)/2})
+	if (new_op)
+	{
+		var id = this.get_id();
+		this.pending_ops[id] = this.clean_tree();
+	}
+	if ((Object.keys(this.pending_ops).length == 1) || (force))
+	{
+		id = Object.keys(this.pending_ops);
+		id = id[id.length - 1];
+		if (parameters)
+		{
+			force_graph.postMessage({parameters:parameters});
+		}
+		force_graph.postMessage({id:id,tree:this.pending_ops[id],x_center:Number(document.querySelector("svg").getBoundingClientRect().width)/2,y_center:Number(document.querySelector("svg").getBoundingClientRect().height)/2});
+	}
 }
 Tree.prototype.changelang = function(lang)
 {
