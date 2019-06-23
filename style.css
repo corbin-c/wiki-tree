@@ -152,7 +152,7 @@ line
 }
 #foot_menu input[type=range]
 {
-	transform: translate(-25vw) rotate(270deg);
+	transform: rotate(270deg) translate(124px,-25vw);
 }
 #foot_menu .visible
 {
@@ -161,10 +161,14 @@ line
 input[type=range] {
   -webkit-appearance: none;
   width: 100%;
-  margin: 5px 0;
+  background: none;
 }
 input[type=range]:focus {
   outline: none;
+  border: 0;
+}
+input[type=range]::-moz-focus-outer {
+    border: 0;
 }
 input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
