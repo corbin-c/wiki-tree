@@ -280,6 +280,21 @@ function infobox(content,id)
 		abstract.innerHTML += content;
 	}
 }
+function multimedia(imageinfo)
+{
+	if (imageinfo.mime.split("/")[0] == "image")
+	{
+		return "<p><img src='"+imageinfo.url+"' /></p>"
+	}
+	else if (imageinfo.mime == "application/ogg")
+	{
+		return "<audio src='"+imageinfo.url+"'></audio>"
+	}
+	else
+	{
+		return "<a href='"+imageinfo.descriptionurl+"'>"+imageinfo.url+"</a>";
+	}
+}
 function display(node)
 {
 	//tree.nodes[node.name].load((node.type == '14')?"categorymembers":"categories");

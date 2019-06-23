@@ -56,10 +56,18 @@ line, circle
 {
    transition: stroke 1s;
 }
-.t0, .t10, .t14
+.t0, .t10, .t14, .t6, .t100
 {
 	fill: #33AAFF;
 	stroke: white;
+}
+.t6
+{
+	fill: #5CC;
+}
+.t100
+{
+	fill: #FA7;
 }
 .t14
 {
@@ -97,12 +105,13 @@ line
 #info_tile h3
 {
 	padding-left: 10px;
-	line-height: 30px;
+	line-height: 25px;
+	height: 50px;
 }
 #info_tile article
 {
 	padding: 5px;
-	height: calc(100% - 30px);
+	height: calc(100% - 50px);
 	font-size: 0.9em;
 	text-align: justify;
 	overflow-y: scroll;
@@ -118,6 +127,10 @@ line
 {
 	position: absolute;
 	left: 20px;
+}
+#info_tile article img, #info_tile article audio, #info_tile article video
+{
+	width: 100%;
 }
 #foot_menu
 {

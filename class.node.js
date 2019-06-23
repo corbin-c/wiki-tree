@@ -22,7 +22,14 @@ Node.prototype.load = function(type)
 		}
 		else if (type == "abstract")
 		{
-			this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&prop=extracts&titles="+this.name+"&exintro=true&exlimit=1&format=json"
+			if (this.type == 6)
+			{
+				this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=imageinfo&iiprop=url|mime&format=json"
+			}
+			else
+			{
+				this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&prop=extracts&titles="+this.name+"&exintro=true&exlimit=1&format=json"				
+			}
 		}
 		else if (type == "categorymembers")
 		{
@@ -61,8 +68,17 @@ Node.prototype.data = async function(data,type)
 		}
 		else if (type == "abstract")
 		{
-			this.abstract = data[Object.keys(data)[0]].extract;
-			infobox(this.abstract,this.id)
+			if (this.type == 6)
+			{
+				this.abstract = data[Object.keys(data)[0]].imageinfo[0];
+				this.abstract = multimedia(this.abstract);
+				infobox(this.abstract,this.id)
+			}
+			else
+			{
+				this.abstract = data[Object.keys(data)[0]].extract;
+				infobox(this.abstract,this.id)
+			}
 		}
 		else
 		{
