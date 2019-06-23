@@ -115,6 +115,11 @@ function d3_graph(event)
 			console.log(d.name);
 			display(d);
 			})
+		.on("contextmenu", function (d, i) {
+            d3.event.preventDefault();
+            tree.delete_node(d.name);
+           // react on right-clicking
+        });
 	nu2 = node2.enter().append("g")
 		.attr("id",  function(d) { return "id2"+d.id })
 		.attr("x", function(d) { return d.x })

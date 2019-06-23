@@ -3,11 +3,57 @@ function Tree()
 	this.lang = "en";
 	this.nodes = {};
 	this.links = {};
-	this.explicit_links = [];
+	this.explicit_links = {};
 	this.internal_links = {};
 	this.id = 0;
 	this.pending_ops = {};
 	this.focal_point = 1;
+}
+Tree.prototype.delete_node = function(name)
+{
+	var tmp_node = this.nodes[name];
+	delete this.nodes[name];
+	for (i in tmp_node.links)
+	{
+		try
+		{
+			console.log("link removed")
+			delete this.explicit_links[tmp_node.links[i].id]
+		}
+		catch
+		{
+			console.log("couldn't delete")
+		}
+		if (typeof this.nodes[i] !== "undefined")
+		{
+			if (Object.keys(this.nodes[i].links).length == 1)
+			{
+				console.log("delete "+i)
+				this.delete_node(i);
+			}
+			else
+			{
+				try
+				{
+					delete this.explicit_links[this.nodes[i].links[name].id]
+				}
+				catch
+				{
+					console.log("couldn't delete")
+				}
+				try
+				{
+					delete this.nodes[i].links[name];
+				}
+				catch
+				{
+					console.log("couldn't delete")
+				}
+			}
+		}
+	}
+	delete tmp_node;
+	this.graph(true,true);
 }
 Tree.prototype.focus = function(name,linked={},level=0)
 {
@@ -120,7 +166,7 @@ Tree.prototype.clean_tree = function()
 {
 	var nodes = Object.values(this.nodes);
 	nodes = JSON.parse(JSON.stringify(nodes));
-	return {links:this.explicit_links,nodes:nodes}
+	return {links:Object.values(this.explicit_links),nodes:nodes}
 }
 Tree.prototype.get_id = function()
 {

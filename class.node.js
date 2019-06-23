@@ -120,7 +120,7 @@ Node.prototype.add_link = function(linked_node,type,explicit=true)
 		if (explicit === true)
 		{
 			var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
-			tree.explicit_links.push(link);
+			tree.explicit_links[link.id] = link;
 			this.links[linked_node].id = link.id;
 			if (this.type == 0)
 			{
