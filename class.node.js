@@ -136,5 +136,6 @@ Node.prototype.pagedRequest = async (url,type,callback) => {
       result.query.pages:result.query;
     callback(result.query,type);
   }
+  console.log(this);
   this.loaded[type] = true;
 }
