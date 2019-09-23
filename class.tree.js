@@ -107,11 +107,11 @@ Tree.prototype.load_nodes = async function(type) {
   }
 }
 Tree.prototype.add_link = function(array) {
-  this.nodes[array[1]].add_link(array[0],array[2],this.nodes[array[0]].add_link(array[1],array[2]))
+  this.nodes[array[1]].addLink(array[0],array[2],this.nodes[array[0]].addLink(array[1],array[2]))
 }
 Tree.prototype.add_internal_link = function(target,source) {
   if (typeof this.nodes[target] !== "undefined") {
-    this.nodes[target].add_link(source,"internal_links",this.nodes[source].add_link(target,"internal_links"))
+    this.nodes[target].addLink(source,"internal_links",this.nodes[source].addLink(target,"internal_links"))
   } else {
     try {
       this.internal_links[target].push(source);
