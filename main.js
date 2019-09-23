@@ -42,7 +42,7 @@ document.getElementById("submit")
     .setAttribute("style","display: block;");
   document.querySelector("#foot_menu")
     .setAttribute("style","display: flex;");
-  tree.new_node(
+  tree.newNode(
     capital_letter(document.getElementById("str_search").value));
   labels = document.getElementById("foot_menu")
     .querySelectorAll("label");
@@ -63,7 +63,7 @@ document.getElementById("submit")
         .getBoundingClientRect().height)*200)
     .scale(400)
     );
-  tree.load_nodes("categories");
+  tree.loadNodes("categories");
 });
 
 function capital_letter(str) {

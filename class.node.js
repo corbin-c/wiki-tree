@@ -1,12 +1,13 @@
-let Node = class {
-  constructor(node,parent) {
+let tree = false;
+let TreeNode = class {
+  constructor(node,parent,father_tree) {
     this.name = node.title;
     this.parent = parent;
     this.type = node.ns;
     this.size = 7;
-    this.links = {};
     this.loaded = {};
-    this.id = tree.get_id();
+    tree = (tree) ? tree:father_tree;
+    //this.id = tree.getId();
     if (this.type == 0) {
       this.load("internal_links");
     }
@@ -35,13 +36,13 @@ let Node = class {
       infobox(this.abstract,this.id);
     }
   }
-  async receiveData(data,type) {
+  receiveData(data,type) {
     if (typeof data !== "undefined") {
       if (type == "internal_links") {
         data = data[Object.keys(data)[0]];
         for (var i in data["links"]) {
           if (data["links"][i].ns == 0) {
-            tree.add_internal_link(data["links"][i].title,this.name)
+            tree.addInternalLink(data["links"][i].title,this.name)
           }
         }
       } else if (type == "abstract") {
@@ -69,38 +70,11 @@ let Node = class {
           }
         }
         for (var i in data[type]) {
-          tree.new_node(data[type][i],this.id)
-          tree.add_link([this.name,data[type][i].title,type])
+          let target = tree.newNode(data[type][i],this.id);
+          tree.addLink(this,target)
         }
         tree.graph()
       }
-    }
-  }
-  addLink(linked_node,type,explicit=true) {
-    if (typeof this.links[linked_node] == "undefined") {
-      var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
-      this.links[linked_node] = {type:type};
-      tree.links[link.id] = link;
-      if (explicit === true) {
-        var link = {id:tree.get_id(),source:this.id,target:tree.nodes[linked_node].id}
-        tree.explicit_links[link.id] = link;
-        this.links[linked_node].id = link.id;
-        if (this.type == 0) {
-          if (tree.nodes[linked_node].type == 0) {
-            this.size++;
-          } else {
-            this.size = this.size+0.1
-          }
-        } else {
-          this.size = this.size+0.1
-        }
-        tree.graph()
-      } else if (explicit !== false) {
-        this.links[linked_node].id = explicit;
-      }
-      return link.id
-    } else {
-      return false;
     }
   }
   async pagedRequest(url,type,callback) {
@@ -120,3 +94,4 @@ let Node = class {
     this.loaded[type] = true;
   }
 }
+export { TreeNode };

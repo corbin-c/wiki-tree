@@ -1,17 +1,20 @@
+import { TreeNode } from "./class.node.js";
 let Tree = class {
   constructor() {
     this.lang = "en";
-    this.nodes = {};
-    this.links = {};
-    this.explicit_links = {};
-    this.internal_links = {};
-    this.id = 0;
+    this.nodes = [];
+    this.links = [];
+    this.internal_links = [];
     this.pending_ops = {};
+    this.id = 0;
     this.focal_point = 1;
     this.base_url = "https://"+this.lang
       +".wikipedia.org/w/api.php?action=query&";
   }
-  delete_node(name) {
+  findNode(title) {
+    return (this.nodes.find(node => (node.name == title)) || false);
+  }
+  deleteNode(name) {
     var tmp_node = this.nodes[name];
     delete this.nodes[name];
     for (i in tmp_node.links) {
@@ -67,8 +70,8 @@ let Tree = class {
   }
   graph(force=false,new_op=true,parameters=false) {
     if (new_op) {
-      var id = this.get_id();
-      this.pending_ops[id] = this.clean_tree();
+      var id = this.getId();
+      this.pending_ops[id] = this.outputTree();
     }
     if ((Object.keys(this.pending_ops).length == 1) || (force)) {
       id = Object.keys(this.pending_ops);
@@ -79,37 +82,44 @@ let Tree = class {
       force_graph.postMessage({id:id,tree:this.pending_ops[id],x_center:Number(document.querySelector("svg").getBoundingClientRect().width)/2,y_center:Number(document.querySelector("svg").getBoundingClientRect().height)/2});
     }
   }
-  changelang(lang) {
+  changeLang(lang) {
     this.lang = lang;
     this.base_url = "https://"+this.lang+".wikipedia.org/w/api.php?action=query&";
   }
-  new_node(response,parent) {
+  newNode(response,parent) {
     if (typeof response === "string") {response = {title:response,ns:0}}
-    if (typeof this.nodes[response.title] === "undefined") {
-      this.nodes[response.title] = new Node(response,parent);
-      if (typeof this.internal_links[response.title] !== "undefined") {
-        for (var i in this.internal_links[response.title]) {
-          try {
-            this.nodes[response.title].add_link(this.internal_links[response.title][i],"internal_links",this.nodes[this.internal_links[response.title][i]].add_link(response.title,"internal_links"))
-          }
-          catch {
-            console.log("Couldn't create link from "+response.title+" to "+this.internal_links[response.title][i]+".")
-          }
-        }
+    if (!this.findNode(response.title)) {
+      let node_param = [response,parent];
+      if (this.nodes.length == 0) {
+        node_param.push(this);
+      }
+      this.nodes.push(new TreeNode(...node_param));
+      try {
+      this.internal_links[response.title].map({
+//here we handle internal links, if any
+      });
+      } catch {
+        console.warn("no matching internal links found");
       }
     }
+    return this.nodes[response.title];
   }
-  load_nodes(type) {
-    for (i in this.nodes) {
-      if (!this.nodes[i].loaded[type]) {
-        this.nodes[i].load(type);
-      }
-    }
+  loadNodes(type) {
+    this.nodes.map(node => {
+      if (!node.loaded[type]) { node.load(type); }
+    });
   }
-  add_link(array) {
-    this.nodes[array[1]].addLink(array[0],array[2],this.nodes[array[0]].addLink(array[1],array[2]))
+  addLink(source,target,explicit=true) {
+    let link = {
+      id:this.getId(),
+      source:source.id,
+      target:target.id,
+      explicit:(explicit===true)
+    };
+    this.links[link.id] = link;
+    if (explicit) { this.addLink(target,source,!explicit); }
   }
-  add_internal_link(target,source) {
+  addInternalLink(target,source) {
     if (typeof this.nodes[target] !== "undefined") {
       this.nodes[target].addLink(source,"internal_links",this.nodes[source].addLink(target,"internal_links"))
     } else {
@@ -121,13 +131,15 @@ let Tree = class {
       }
     }
   }
-  clean_tree() {
-    var nodes = Object.values(this.nodes);
+  outputTree() {
+    let nodes = Object.values(this.nodes);
     nodes = JSON.parse(JSON.stringify(nodes));
-    return {links:Object.values(this.explicit_links),nodes:nodes}
+    return {links:Object.values(this.links.filter(link => (link.explicit))),
+            nodes:nodes};
   }
-  get_id() {
+  getId() {
     this.id = this.id+1;
     return this.id;
   }
 }
+export { Tree };
