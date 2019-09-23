@@ -39,7 +39,7 @@ document.getElementById("submit")
 .addEventListener("click", async (e) => {
   document.querySelector("form").setAttribute("style","opacity: 0;");
   document.querySelector("svg")
-    .setAttribute("style","visibility:hidden; display: block;");
+    .setAttribute("style","display: block;");
   document.querySelector("#foot_menu")
     .setAttribute("style","display: flex;");
   tree.new_node(
