@@ -1,28 +1,33 @@
 // D3 JS INIT
 function zoom_actions(){
-  var transform = d3.event.transform;
+  let transform = d3.event.transform;
   zoom = transform;
   g.attr("transform", transform)
 }
-var svg = d3.select("svg")
-var g = svg.append("g").attr("class", "everything");
-var h = g.append("g").attr("class", "main_container");;
-var svg_nodes2 = h.append("g").attr("class", "backnodes")
-var svg_links = h.append("g").attr("class", "links")
-var svg_nodes = h.append("g").attr("class", "nodes")
-var f_x = 0;
-var f_y = 0;
-var zoom = {};
-var display_state = {state:0,id:0};
-var force_graph = new Worker('worker.force.js');
-var zoom_handler = d3.zoom().on("zoom", zoom_actions);
+let svg = d3.select("svg");
+let g = svg.append("g").attr("class", "everything");
+let h = g.append("g").attr("class", "main_container");
+let svg_nodes2 = h.append("g").attr("class", "backnodes");
+let svg_links = h.append("g").attr("class", "links");
+let svg_nodes = h.append("g").attr("class", "nodes");
+let f_x = 0;
+let f_y = 0;
+let zoom = {};
+let display_state = {state:0,id:0};
+let force_graph = new Worker('worker.force.js');
+let zoom_handler = d3.zoom().on("zoom", zoom_actions);
 //zoom_handler(svg);
-svg.call(zoom_handler)
-document.querySelector("#info_tile").addEventListener("click",function (e) {document.querySelector("#focus_text").remove();document.querySelector("#info_tile").classList.remove("visible");display_state.state = 0;} )
+svg.call(zoom_handler);
+document.querySelector("#info_tile")
+  .addEventListener("click",function (e) {
+    document.querySelector("#focus_text").remove();
+    document.querySelector("#info_tile").classList.remove("visible");
+    display_state.state = 0;
+  })
 // CONSTRUCT NEW TREE
 tree = new Tree();
 force_graph.onmessage = function (event) {
-  delete tree.pending_ops[event.data.id]
+  delete tree.pending_ops[event.data.id];
   if (Object.keys(tree.pending_ops).length >= 1) {
     tree.graph(true,false);
     tree.pending_ops = {};
@@ -30,42 +35,55 @@ force_graph.onmessage = function (event) {
   d3_graph(event);
 };
 // BELOW TREE IS FED WITH USER INPUT
-document.getElementById("submit").addEventListener("click", async function(e){
-  //console.log(document.getElementById("str_search").value)
+document.getElementById("submit")
+.addEventListener("click", async (e) => {
   document.querySelector("form").setAttribute("style","opacity: 0;");
-  document.querySelector("svg").setAttribute("style","visibility:hidden; display: block;");
-  document.querySelector("#foot_menu").setAttribute("style","display: flex;");
-  tree.new_node(capital_letter(document.getElementById("str_search").value))
-  labels = document.getElementById("foot_menu").querySelectorAll("label")
+  document.querySelector("svg")
+    .setAttribute("style","visibility:hidden; display: block;");
+  document.querySelector("#foot_menu")
+    .setAttribute("style","display: flex;");
+  tree.new_node(
+    capital_letter(document.getElementById("str_search").value));
+  labels = document.getElementById("foot_menu")
+    .querySelectorAll("label");
   for (i in [...labels]) {
-    labels[i].addEventListener("click", function (e) { e.target.nextSibling.classList.toggle("visible"); })
+    labels[i].addEventListener("click", function (e) {
+      e.target.nextSibling.classList.toggle("visible");
+    });
   }
-  document.getElementById("k_factor").addEventListener("change", function(e){
-    tree.graph(true,true,Number(e.target.value))
-  })
+  document.getElementById("k_factor")
+    .addEventListener("change", function(e){
+      tree.graph(true,true,Number(e.target.value));
+  });
   svg.call(zoom_handler.transform, d3.zoomIdentity
-    .translate(-Number(document.querySelector("svg").getBoundingClientRect().width)*200,-Number(document.querySelector("svg").getBoundingClientRect().height)*200)
+    .translate(
+      -Number(document.querySelector("svg")
+        .getBoundingClientRect().width)*200,
+      -Number(document.querySelector("svg")
+        .getBoundingClientRect().height)*200)
     .scale(400)
     );
   tree.load_nodes("categories");
-})
+});
 
 function capital_letter(str) {
   str = str.split(" ");
-  for (var i=0,x=str.length;i<x;i++) {str[i]=str[i][0].toUpperCase()+str[i].substr(1);}
+  for (let i=0,x=str.length;i<x;i++) {
+    str[i]=str[i][0].toUpperCase()+str[i].substr(1);
+  }
   return str.join(" ");
 }
 function incr_wait(i,t,rand=false) {
   t = (rand) ? Math.floor(t+2*t*Math.random()):t;
-  return new Promise(function(resolve,reject){
-    setTimeout(function(){
+  return new Promise(function(resolve,reject) {
+    setTimeout(function() {
       resolve(i+1);
     },t)
   })
 }
 function d3_graph(event) {
   // HERE IS WHERE ACTUAL GRAPH IS DRAWN
-  var duration = 220;
+  let duration = 220;
   /*if (document.querySelector("#id"+tree.focal_point+" circle") !== null) {
     f_x = document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cx");
     f_y = document.querySelector("#id"+tree.focal_point+" circle").getAttribute("cy");
@@ -75,8 +93,8 @@ function d3_graph(event) {
     h.transition().duration(duration)
       .attr("transform", function () { return "translate("+(x-f_x)+","+(y-f_y)+")"; })
   }*/
-  var node2 = svg_nodes2.selectAll("g").data(event.data.nodes, function(d) { return d.name });
-  var node = svg_nodes.selectAll("g").data(event.data.nodes, function(d) { return d.name });
+  let node2 = svg_nodes2.selectAll("g").data(event.data.nodes, function(d) { return d.name });
+  let node = svg_nodes.selectAll("g").data(event.data.nodes, function(d) { return d.name });
 
   node.exit().transition().duration(duration)
     .style("opacity",0)
@@ -247,7 +265,7 @@ function d3_graph(event) {
 }
 function infobox(content,id) {
   if (display_state.id == id) { 
-    var abstract = document.createElement("article");
+    let abstract = document.createElement("article");
     document.querySelector("#info_tile").append(abstract);
     abstract.innerHTML += content;
   }
@@ -264,7 +282,7 @@ function multimedia(imageinfo) {
 function display(node) {
   //tree.nodes[node.name].load((node.type == '14')?"categorymembers":"categories");
   if (display_state.state == 0) {
-    var cloned = document.querySelector("#id"+node.id+" text").cloneNode(true)
+    let cloned = document.querySelector("#id"+node.id+" text").cloneNode(true)
     try {
       document.querySelector(".track").classList.remove("track");
     }

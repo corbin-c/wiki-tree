@@ -1,8 +1,7 @@
-onmessage = function(e) { load(e.data) }
+onmessage = (e) => { load(e.data) }
 function load(e,proxy=false) {
-  var url = (proxy) ? e.proxy+e.url:e.url;
-  var xmlhttp = new XMLHttpRequest();
-  
+  let url = (proxy) ? e.proxy+e.url:e.url;
+  let xmlhttp = new XMLHttpRequest();
   xmlhttp.responseType = e.type;
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4) {
