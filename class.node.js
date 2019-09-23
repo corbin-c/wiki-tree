@@ -11,23 +11,26 @@ let Node = class {
       this.load("internal_links");
     }
   }
+  build_url(type) {
+    let url = {
+      "categories":"titles="+this.name
+        +"&prop=categories&cllimit=500&clshow=!hidden",
+      "abstract":"prop=extracts&titles="+this.name
+        +"&exintro=true&exlimit=1",
+      "abstract-6":"titles="+this.name
+        +"&prop=imageinfo&iiprop=url|mime",
+      "categorymembers":"cmtitle="+this.name
+        +"&cmlimit=500&list=categorymembers",
+      "internal_links":"titles="+this.name
+        +"&prop=links&pllimit=500"
+    };
+    return tree.base_url+url[type]+"&format=json&redirects&origin=*&utf8";
+  }
   load(type) {
     if (typeof this.loaded[type] === "undefined") {
-      if (type == "categories") {
-        this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=categories&format=json&cllimit=500&clshow=!hidden";
-      } else if (type == "abstract") {
-        if (this.type == 6) {
-          this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=imageinfo&iiprop=url|mime&format=json";
-        } else {
-          this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&prop=extracts&titles="+this.name+"&exintro=true&exlimit=1&format=json";
-        }
-      } else if (type == "categorymembers") {
-        this.url = "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&cmtitle="+this.name+"&format=json&cmlimit=500&list=categorymembers";
-      } else if (type == "internal_links") {
-        this.url =  "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=links&format=json&pllimit=500";
-      }
-      this.url = this.url+"&redirects&origin=*&utf8";
-      this.pagedRequest(this.url,type,this.receiveData); 
+      let url = ((type == "abstract") && (this.type == 6)) ? "abstract-6":type;
+      url = this.build_url(url);
+      this.pagedRequest(url,type,this.receiveData); 
     } else if (type == "abstract") {
       infobox(this.abstract,this.id);
     }

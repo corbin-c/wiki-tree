@@ -7,6 +7,7 @@ function Tree() {
   this.id = 0;
   this.pending_ops = {};
   this.focal_point = 1;
+  this.base_url = "https://"+this.lang+".wikipedia.org/w/api.php?action=query&";
 }
 Tree.prototype.delete_node = function(name) {
   var tmp_node = this.nodes[name];
@@ -79,6 +80,7 @@ Tree.prototype.graph = function(force=false,new_op=true,parameters=false) {
 }
 Tree.prototype.changelang = function(lang) {
   this.lang = lang;
+  this.base_url = "https://"+this.lang+".wikipedia.org/w/api.php?action=query&";
 }
 Tree.prototype.new_node = function(response,parent) {
   if (typeof response === "string") {response = {title:response,ns:0}}
