@@ -5,7 +5,7 @@ importScripts("https://d3js.org/d3-timer.v1.min.js");
 importScripts("https://d3js.org/d3-force.v1.min.js");
 const distance = 60;
 const strength = -175;
-const k = 1;
+let k = 1;
 onmessage = function(event) {
   if (typeof event.data.parameters !== "undefined") {
     k = event.data.parameters;
