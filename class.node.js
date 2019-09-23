@@ -121,7 +121,7 @@ function handle_links(e,_obj,type,obj) {
   }
   delete _obj.url
 }
-Node.prototype.pagedRequest = async (url,type,callback) => {
+Node.prototype.pagedRequest = async function (url,type,callback) {
   let result = await fetch(url);
   result = await result.json();
   result.query = (type == "categorymembers") ?
@@ -136,6 +136,5 @@ Node.prototype.pagedRequest = async (url,type,callback) => {
       result.query.pages:result.query;
     callback(result.query,type);
   }
-  console.log(this);
   this.loaded[type] = true;
 }
