@@ -301,7 +301,7 @@
               ['ᏣᎳᎩ','chr'],
               ['한국어','ko'],
               ['𐌲𐌿𐍄𐌹𐍃𐌺','got']];
-  select = document.createElement("select");
+  let select = document.createElement("select");
   lang.map(l => {
     let opt = document.createElement("option");
     opt.value = l[1];
