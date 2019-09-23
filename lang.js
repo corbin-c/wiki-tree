@@ -1,5 +1,5 @@
-function lang() {
-  var lang = [['Acèh','ace'],
+(() => {
+  let lang = [['Acèh','ace'],
               ['Afrikaans','af'],
               ['Akan','ak'],
               ['Alemannisch','als'],
@@ -302,18 +302,17 @@ function lang() {
               ['한국어','ko'],
               ['𐌲𐌿𐍄𐌹𐍃𐌺','got']];
   select = document.createElement("select");
-  for (i in lang) {
-    var opt = document.createElement("option");
-    opt.value = lang[i][1];
-    opt.innerHTML = lang[i][0];
-    if (lang[i][1] == "en") {
+  lang.map(l => {
+    let opt = document.createElement("option");
+    opt.value = l[1];
+    opt.innerHTML = l[0];
+    if (l[1] == "en") {
       opt.setAttribute("selected","");
     }
     select.append(opt)
-  }
+  });
   select.addEventListener("change",function(e) {
     tree.changelang(e.target.value)
   })
   document.getElementById("mainform").append(select)
-}
-lang()
+})();
