@@ -26,11 +26,12 @@ Node.prototype.load = function(type) {
       this.url =  "https://"+tree.lang+".wikipedia.org/w/api.php?action=query&titles="+this.name+"&prop=links&format=json&pllimit=500";
     }
     this.url = this.url+"&redirects&origin=*&utf8";
-    this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/");
+    /*this.url = new Url(this.url,"https://cors-anywhere.herokuapp.com/");
     var _this = this;
     this.url.ready(function(e) {
       handle_links(e,_this,type,this)
-    }); 
+    });*/
+    this.pagedRequest(this.url,type,this.data); 
   } else if (type == "abstract") {
     infobox(this.abstract,this.id);
   }
@@ -119,4 +120,21 @@ function handle_links(e,_obj,type,obj) {
     _obj.loaded[type] = true;
   }
   delete _obj.url
+}
+Node.prototype.pagedRequest = async (url,type,callback) => {
+  let result = await fetch(url);
+  result = await result.json();
+  result.query = (type == "categorymembers") ?
+    result.query.pages:result.query;
+  callback(result.query,type);
+  while (typeof result.continue !== "undefined") {
+    url = url+"&"+(Object.keys(result.continue)[0])+"="
+      +result.continue[Object.keys(result.continue)[0]];
+    result = await fetch(url);
+    result = await result.json();
+    result.query = (type == "categorymembers") ?
+      result.query.pages:result.query;
+    callback(result.query,type);
+  }
+  this.loaded[type] = true;
 }
