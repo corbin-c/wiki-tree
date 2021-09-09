@@ -47,21 +47,4 @@ const wiki = class {
   }
 };
 
-//~ (async () => {
-  //~ let z = new wiki("fr", window.location.origin);
-  //~ let url = z.buildRequest({
-    //~ "action": "query",
-    //~ "list": "categorymembers",
-    //~ "cmtitle": "Catégorie:Chanteur_jamaïcain_de_reggae",
-    //~ "cmtype": ["page", "subcat"],
-    //~ "cmlimit": 50
-  //~ });
-  //~ let resultsGenerator = z.fetchAndContinue(url);
-  //~ let results = true;
-  //~ while (typeof results !== "undefined") {
-    //~ results = (await resultsGenerator.next()).value;
-    //~ console.log(results);
-  //~ }
-//~ })()
-
 export default wiki;
