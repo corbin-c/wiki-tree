@@ -1,13 +1,13 @@
 const wiki = class {
-  constructor(lang,host) {
+  constructor(lang,origin) {
     this.baseUrl = `https://${lang}.wikipedia.org/w/api.php?`;
-    this.host = host;
+    this.origin = origin;
   }
   buildRequest(options) {
     const getParameters = (options) => {
       options.format = "json";
       options.utf8 = true;
-      options.origin = this.host;
+      options.origin = this.origin;
       options.redirects = true;
       const queryParameters = Object.keys(options).map(e => {
         return e+"="+((typeof options[e] === "object")
