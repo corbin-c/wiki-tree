@@ -15,6 +15,7 @@
 }
 html {
   height: 100vh;
+  overflow: hidden;
 }
 body {
   width: 100%;
@@ -64,11 +65,18 @@ h1 {
   }
   100% {
     opacity: 0;
-    display: none;
+    position: absolute;
+    top: 200vh;
   }
 }
 #splash.hidden {
   animation: 1s disappear forwards;
+}
+#splash img {
+  width: min(10vw, 10vh);
+  position: absolute;
+  left: calc(50vw - min(5vw, 5vh));
+  top: 14.6rem;
 }
 label {
   font-size: 1.65rem;
@@ -109,6 +117,7 @@ input:focus, select:focus {
   top: .2rem;
 }
 .btn:hover, .btn:focus {
+  outline: none;
   background: var(--neutral);
   color: var(--contrast);
   border: 2px solid var(--contrast);
