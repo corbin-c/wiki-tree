@@ -14,14 +14,10 @@ const WikiAPI = class {
           : options[e])
       }).join("&");
     }
-    if ((options.titles) && (options.titles.length > 50)) {
-      let titlesChunks = [];
-      for (let i = 0; i < options.titles.length; i += 50) {
-        titlesChunks.push(options.titles.slice(i, i+50));
-      }
-      return titlesChunks.map(e => {
-        options.titles = e;
-        return [this.baseUrl+getParameters(options)];
+    if ((options.pageids) && (typeof options.pageids === "object")) {
+      return options.pageids.map(e => {
+        const newOptions = {...options, pageids: e};
+        return [this.baseUrl+getParameters(newOptions)];
       });
     }
     return [this.baseUrl+getParameters(options)];
@@ -30,13 +26,30 @@ const WikiAPI = class {
     return (async function*(url) {
       let results = true;
       let nextBatch = true;
+      let finished = [];
+      let lastContinue = "";
       while (typeof nextBatch !== "undefined") {
-        let continueString = (results === true)
+        let continueKey = Object.keys(nextBatch)
+          .filter(e => !finished.includes(e))[0];
+        console.log(continueKey, typeof results, typeof nextBatch, finished, lastContinue);
+        if ((nextBatch !== true)
+        && ((typeof continueKey === "undefined")
+          || continueKey === "continue")) {
+          yield undefined;
+        }
+        let continueString = ((results === true) && (nextBatch === true))
           ? ""
           : "&"
-            +(Object.keys(nextBatch)[0])
+            +(continueKey)
             +"="
-            +nextBatch[Object.keys(nextBatch)[0]];
+            +nextBatch[continueKey];
+        if (typeof continueKey !== "undefined") {
+          if ((lastContinue !== continueKey)
+            && (lastContinue !== "")) {
+            finished.push(lastContinue);
+          }
+          lastContinue = continueKey;
+        }
         results = await fetch(url+continueString);
         results = await results.json();
         nextBatch = results.continue;
