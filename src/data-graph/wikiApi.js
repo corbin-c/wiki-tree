@@ -1,31 +1,30 @@
-const wiki = class {
-  constructor(lang,origin) {
+const WikiAPI = class {
+  constructor(lang) {
     this.baseUrl = `https://${lang}.wikipedia.org/w/api.php?`;
-    this.origin = origin;
   }
   buildRequest(options) {
     const getParameters = (options) => {
       options.format = "json";
       options.utf8 = true;
-      options.origin = this.origin;
+      options.origin = "*";
       options.redirects = true;
-      const queryParameters = Object.keys(options).map(e => {
+      return Object.keys(options).map(e => {
         return e+"="+((typeof options[e] === "object")
           ? options[e].join("|")
           : options[e])
       }).join("&");
     }
-    if ((options.titles) && (option.titles.length > 50)) {
+    if ((options.titles) && (options.titles.length > 50)) {
       let titlesChunks = [];
-      for (i = 0,; i < array.length; i += 50) {
-        titlesChunks.push(titles.slice(i, i+50));
+      for (let i = 0; i < options.titles.length; i += 50) {
+        titlesChunks.push(options.titles.slice(i, i+50));
       }
       return titlesChunks.map(e => {
         options.titles = e;
-        return [this.baseUrl+parameters(options)];
+        return [this.baseUrl+getParameters(options)];
       });
     }
-    return [this.baseUrl+parameters(options)];
+    return [this.baseUrl+getParameters(options)];
   }
   fetchAndContinue(url) {
     return (async function*(url) {
@@ -47,4 +46,4 @@ const wiki = class {
   }
 };
 
-export default wiki;
+export default WikiAPI;
