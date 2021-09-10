@@ -1,24 +1,17 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Splash from "./components/splash.js";
+import "./index.css";
 
 function App() {
+  const [wt,setWT] = useState({});
+  const init = (search) => {
+    setWT(search);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main className="App">
+      <Splash handleInit={ init } visibility={ (Object.keys(wt).length === 0) } />
+    </main>
   );
 }
 
