@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background-color:none;visibility:visible; display: block;" viewBox="0 0 512 512">
+<style>
+.bt {
+  fill: #3e4039;
+  stroke: #3e4039;
+}
+.links line {
+  stroke: #3e4039;
+}
+.nodes circle {
+  stroke: #fbfbf2;
+  fill: #ea526f;
+}
+</style>
+<circle xmlns="http://www.w3.org/2000/svg" cx="256" cy="256" fill="#1b5299" r="240"/>  
+<g class="everything" transform="translate(-1480,-950) scale(3)">
+<g class="main_container">
+<g class="backnodes">
+<g id="id21" x="969.0954965193023" y="378.9265513936268">
+<circle cx="579.7576105811632" cy="400.5390490590927" stroke-width="0" class="bt" r="22">
+</circle>
+</g>
+<g id="id22" x="920.9045034806977" y="423.0734486063732">
+<circle cx="539.7640057263301" cy="443.7935565350292" r="11" stroke-width="0" class="bt">
+</circle>
+</g>
+<g id="id27" x="941.1399422831713" y="326.61062114222995">
+<circle cx="601.3608378058906" cy="345.6133950558256" r="11" stroke-width="0" class="bt">
+</circle>
+</g>
+<g id="id212" x="1004.9676708633384" y="448.35336751001114">
+<circle cx="629.8900147791759" cy="431.1308749345224" r="11" stroke-width="0" class="bt">
+</circle>
+</g>
+<g id="id217" x="876.3704491193859" y="372.18877714190467">
+<circle cx="521.0976444346725" cy="394.57519313337633" r="11" stroke-width="0" class="bt">
+</circle>
+</g>
+<g id="id227" x="925.9528813435962" y="474.64564700523505">
+<circle cx="636.1737724602394" cy="383.5753357571775" r="11" stroke-width="0" class="bt">
+</circle>
+</g>
+<g id="id232" x="901.8993656114552" y="340.46980667183084">
+<circle cx="590.5679532475287" cy="458.56575200581585" r="11" stroke-width="0" class="bt">
+</circle>
+</g>
+<g id="id237" x="1020.8785970568621" y="407.3990000520505">
+<circle cx="549.3859046893139" cy="350.2060954188776" r="11" stroke-width="0" class="bt">
+</circle>
+</g>
+</g>
+<g class="links">
+<line x1="579.7576105811632" y1="400.5390490590927" x2="539.7640057263301" y2="443.7935565350292" id="id4" stroke="black" stroke-width="3">
+</line>
+<line x1="579.7576105811632" y1="400.5390490590927" x2="601.3608378058906" y2="345.6133950558256" id="id9" stroke="black" stroke-width="3">
+</line>
+<line x1="579.7576105811632" y1="400.5390490590927" x2="629.8900147791759" y2="431.1308749345224" id="id14" stroke="black" stroke-width="3">
+</line>
+<line x1="579.7576105811632" y1="400.5390490590927" x2="521.0976444346725" y2="394.57519313337633" id="id19" stroke="black" stroke-width="3">
+</line>
+<line x1="579.7576105811632" y1="400.5390490590927" x2="636.1737724602394" y2="383.5753357571775" id="id29" stroke="black" stroke-width="3">
+</line>
+<line x1="579.7576105811632" y1="400.5390490590927" x2="590.5679532475287" y2="458.56575200581585" id="id34" stroke="black" stroke-width="3">
+</line>
+<line x1="579.7576105811632" y1="400.5390490590927" x2="549.3859046893139" y2="350.2060954188776" id="id39" stroke="black" stroke-width="3">
+</line>
+</g>
+<g class="nodes">
+<g id="id1" x="969.0954965193023" y="378.9265513936268">
+<circle cx="579.7576105811632" cy="400.5390490590927" stroke-width="2" class="t0" r="18">
+</circle>
+</g>
+<g id="id2" x="920.9045034806977" y="423.0734486063732">
+<circle cx="539.7640057263301" cy="443.7935565350292" r="7" stroke-width="2" class="t14">
+</circle>
+</g>
+<g id="id7" x="941.1399422831713" y="326.61062114222995">
+<circle cx="601.3608378058906" cy="345.6133950558256" r="7" stroke-width="2" class="t14">
+</circle>
+</g>
+<g id="id12" x="1004.9676708633384" y="448.35336751001114">
+<circle cx="629.8900147791759" cy="431.1308749345224" r="7" stroke-width="2" class="t14">
+</circle>
+</g>
+<g id="id17" x="876.3704491193859" y="372.18877714190467">
+<circle cx="521.0976444346725" cy="394.57519313337633" r="7" stroke-width="2" class="t14">
+</circle>
+</g>
+<g id="id27" x="925.9528813435962" y="474.64564700523505">
+<circle cx="636.1737724602394" cy="383.5753357571775" r="7" stroke-width="2" class="t14">
+</circle>
+</g>
+<g id="id32" x="901.8993656114552" y="340.46980667183084">
+<circle cx="590.5679532475287" cy="458.56575200581585" r="7" stroke-width="2" class="t14">
+</circle>
+</g>
+<g id="id37" x="1020.8785970568621" y="407.3990000520505">
+<circle cx="549.3859046893139" cy="350.2060954188776" r="7" stroke-width="2" class="t14">
+</circle>
+</g>
+</g>
+</g>
+</g>
+  
+</svg>
