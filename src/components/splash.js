@@ -9,6 +9,7 @@ function Splash(props) {
     <section id="splash" className={ visibility ? "":"hidden" }>
       <h1>Welcome to Wiki-Tree!</h1>
       <p>select your language and start exploring</p>
+      <img src="./logo.svg" alt="Wiki-Tree logo" />
       <SearchForm handleSubmit={ init } />
       <p className="wt-info">
         Wiki-Tree is a project by Clément Corbin aimed at
