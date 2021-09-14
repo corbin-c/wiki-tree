@@ -17,13 +17,20 @@ const WikiAPI = class {
     if ((options.pageids) && (typeof options.pageids === "object")) {
       return options.pageids.map(e => {
         const newOptions = {...options, pageids: e};
-        return [this.baseUrl+getParameters(newOptions)];
+        return {
+          pageid: e,
+          url: this.baseUrl+getParameters(newOptions)
+        };
       });
     }
-    return [this.baseUrl+getParameters(options)];
+    return [{
+      pageid: options.pageids,
+      cmpageid: options.cmpageid,
+      url: this.baseUrl+getParameters(options)
+    }];
   }
   fetchAndContinue(url) {
-    return (async function*(url) {
+    return (async function*(url,fetcher) {
       let results = true;
       let nextBatch = true;
       let finished = [];
@@ -31,7 +38,6 @@ const WikiAPI = class {
       while (typeof nextBatch !== "undefined") {
         let continueKey = Object.keys(nextBatch)
           .filter(e => !finished.includes(e))[0];
-        console.log(continueKey, typeof results, typeof nextBatch, finished, lastContinue);
         if ((nextBatch !== true)
         && ((typeof continueKey === "undefined")
           || continueKey === "continue")) {
@@ -55,7 +61,7 @@ const WikiAPI = class {
         nextBatch = results.continue;
         yield results.query;
       }
-    })(url);
+    })(url,this.fetcher);
   }
 };
 
