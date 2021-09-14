@@ -1,41 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import Splash from "./components/splash.js";
-import WikiGraph from "./data-graph/graph.js";
+import Drawer from "./components/drawer.js";
+import ToolBar from "./components/toolbar.js";
+import Graph from "./components/graph.js";
 import "./index.css";
 
 function App() {
-  const [nodes,setNodes] = useState([]);
-  const [edges,setEdges] = useState([]);
-  const callback = (type, action, payload) => {
-    console.log(type, action, payload);
-   if (type === "nodes") {
-     if (action === "add") {
-       const newNodes = [...nodes, payload];
-       setNodes(newNodes);
-     } else {
-       const newNodes = nodes.filter(e => e !== payload);
-     }
-   } else if (type === "edges") {
-     if (action === "add") {
-       const newNodes = [...nodes, payload];
-       setNodes(newNodes);
-     } else {
-       const newNodes = nodes.filter(e => e !== payload);
-     }
-   }
-  };
-  const init = (search) => {
-    const graph = new WikiGraph(search.lang, callback);
-    graph.createNode({
-      ns: 0,
-      title: search.searchString,
-      pageid: false
-    });
-  }
-
+  const searchString = useSelector(state => state.init.searchString);
+  const lang = useSelector(state => state.init.lang);
   return (
     <main className="App">
-      <Splash handleInit={ init } visibility={ nodes.length === 0 } />
+      <Splash />
+      {
+        (lang !== "" && searchString !== "") && (
+        <>
+          <Graph />
+          <ToolBar />
+        </>
+        )
+      }
+      <Drawer />
     </main>
   );
 }
