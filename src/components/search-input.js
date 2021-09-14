@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
-import WikiAPI from "../data-graph/wikiApi.js";
+import WikiAPI from "../wikiApi.js";
 
 function SearchInput(props) {
-  const { handleChanges, lang } = props;
+  const { handleChanges, lang, id } = props;
   const [searchString,setSearchString] = useState("");
   const [resultsList,setResults] = useState([]);
   const timer = useRef(null);
@@ -28,11 +28,15 @@ function SearchInput(props) {
         srsearch:searchString,
         srnamespace:0,
         srlimit:10
-      });
-      let results = await fetch(url);
-      results = await results.json();
-      results = results.query.search;
-      setResults(results);
+      })[0].url;
+      try {
+        let results = await fetch(url);
+        results = await results.json();
+        results = results.query.search;
+        setResults(results);
+      } catch(e) {
+        console.error(e);
+      }
     } else {
       setResults([]);
     }
@@ -53,16 +57,16 @@ function SearchInput(props) {
 
   return (
     <>
-      <label htmlFor="searchInput">Search terms:</label>
+      <label htmlFor={ "searchInput"+id }>Search terms:</label>
       <input
-        id="searchInput"
+        id={ "searchInput"+id }
         onChange={ inputChange }
         type="search"
-        list="results"
+        list={ "results"+id }
         value={ searchString }
         className="textInput"
       />
-      <datalist id="results">
+      <datalist id={ "results"+id }>
         { displaySearchResults() }
       </datalist>
     </>
