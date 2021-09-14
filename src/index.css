@@ -122,3 +122,107 @@ input:focus, select:focus {
   color: var(--contrast);
   border: 2px solid var(--contrast);
 }
+#toolbar {
+  position: fixed;
+  bottom: 0;
+  height: 70px;
+  display: flex;
+  padding-left: 30px;
+  align-items: center;
+}
+#toolbar button {
+  margin-right: 30px;
+  width: 50px;
+  height: 50px;
+  border: 2px solid var(--neutral2);
+  background: var(--neutral);
+  color: var(--dark);
+  border-radius: 100%;
+  cursor: pointer;
+}
+#toolbar button:hover, #toolbar button:focus {
+  outline: none;
+  background: var(--dark);
+  color: var(--neutral);
+  border: 2px solid var(--contrast);
+}
+#toolbar button .material-icons-outlined, #drawer main button .material-icons-outlined {
+  font-size: 1.7rem;
+  position: relative;
+  top: .1rem;
+}
+#drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  width: 450px;
+  background: var(--neutral);
+  transition: 1s ease-in-out transform;
+  transform: translateX(0);
+  padding: 1rem;
+}
+#drawer.hidden {
+  transform: translateX(450px);
+}
+.closebtn {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  color: var(--dark);
+  background: none;
+  border: none;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+.closebtn:hover, .closebtn:focus {
+  outline: none;
+  color: var(--contrast);
+}
+#drawer header {
+  border-bottom: 2px solid var(--neutral2);
+  font-size: 1.8rem;
+  padding-bottom: 1rem;
+  padding-right: 2rem;
+}
+#drawer main {
+  margin-top: 2rem;
+}
+#drawer form {
+  display: flex;
+  flex-direction: column;
+}
+#drawer article {
+  font-size: 2rem;
+  height: calc(100vh - 18rem);
+  overflow-y: auto;
+}
+#drawer .buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 70px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+#drawer .buttons button, #drawer .buttons a {
+  margin-right: 30px;
+  width: 50px;
+  height: 50px;
+  border: 2px solid var(--neutral2);
+  background: var(--dark);
+  color: var(--neutral);
+  border-radius: 100%;
+  cursor: pointer;
+  text-align: center;
+}
+#drawer .buttons button:hover, #drawer .buttons button:focus,
+#drawer .buttons a:hover, #drawer .buttons a:focus {
+  outline: none;
+  background: var(--neutral);
+  color: var(--dark);
+  border: 2px solid var(--contrast);
+}
