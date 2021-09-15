@@ -19,7 +19,7 @@ function SearchInput(props) {
     });
   }
 
-  const performSearch = async (searchString) => {
+  const performSearch = async (searchString, input) => {
     if (searchString.length > 0) {
       //perform full text search
       const url = wiki.buildRequest({
@@ -34,6 +34,9 @@ function SearchInput(props) {
         results = await results.json();
         results = results.query.search;
         setResults(results);
+        setTimeout(() => {
+          input.focus();
+        }, 100);
       } catch(e) {
         console.error(e);
       }
@@ -43,22 +46,29 @@ function SearchInput(props) {
   }
 
   const inputChange = (e) => {
+    if (e.stopImmediatePropagation) {
+      e.stopImmediatePropagation();
+    }
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
     setSearchString(e.target.value);
     clearTimeout(timer.current);
     handleChanges(e.target.value);
     timer.current = setTimeout(() => {
-      triggerChange(e.target.value);
+      triggerChange(e.target.value, e.target);
     }, WAIT_INTERVAL);
   }
 
-  const triggerChange = (value) => {
-    performSearch(value);
+  const triggerChange = (value, input) => {
+    performSearch(value, input);
   }
 
   return (
     <>
       <label htmlFor={ "searchInput"+id }>Search terms:</label>
       <input
+        autoComplete="off"
         id={ "searchInput"+id }
         onChange={ inputChange }
         type="search"
@@ -66,9 +76,13 @@ function SearchInput(props) {
         value={ searchString }
         className="textInput"
       />
-      <datalist id={ "results"+id }>
-        { displaySearchResults() }
-      </datalist>
+      {
+        resultsList.length > 0 ?
+        (<datalist id={ "results"+id }>
+          { displaySearchResults() }
+        </datalist>)
+        : (<></>)
+      }
     </>
   )
 }
