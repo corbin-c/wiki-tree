@@ -162,6 +162,9 @@ input:focus, select:focus {
   transition: 1s ease-in-out transform;
   transform: translateX(0);
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 70px;
 }
 #drawer.hidden {
   transform: translateX(450px);
@@ -189,15 +192,26 @@ input:focus, select:focus {
 }
 #drawer main {
   margin-top: 2rem;
+  height: calc(100% - 70px - 2rem);
+  display: flex;
+  margin-bottom: 70px;
+  flex: 0 0 auto;
+  flex-direction: column;
+  position: relative;
 }
 #drawer form {
   display: flex;
   flex-direction: column;
 }
 #drawer article {
+  margin-bottom: 1.5rem;
   font-size: 2rem;
-  height: calc(100vh - 18rem);
   overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 12rem;
+}
+#drawer article:first-of-type {
+  min-height: calc(50% - 1.5rem);
 }
 #drawer .buttons {
   display: flex;
@@ -225,4 +239,12 @@ input:focus, select:focus {
   background: var(--neutral);
   color: var(--dark);
   border: 2px solid var(--contrast);
+}
+#drawer article details {
+  margin-bottom: 1.5rem;
+}
+#drawer article details li {
+  margin-left: .5rem;
+  font-size: .85em;
+  cursor: pointer;
 }
