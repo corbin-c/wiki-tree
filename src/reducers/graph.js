@@ -66,6 +66,16 @@ const graphReducer = (state, action) => {
           newEdge
         ]
       }
+    case "nodes/loaded":
+      return {
+        edges: [...state.edges],
+        nodes: [...state.nodes].map(e => {
+          return {
+            ...e,
+            loaded: (e.id === payload.id) ? true : e.loaded
+          };
+        })
+      }
     case "nodes/remove":
       return {
         ...state,
@@ -102,4 +112,23 @@ const graphReducer = (state, action) => {
       return state;
   }
 }
+
+const adjacentNodes = (id, entity) => {
+  return (state) => {
+    try {
+      const edges = state.graph.nodes
+        .find(e => e.id === id).edges
+        .filter(e => 
+          state.graph.edges
+            .find(edge => edge.id === e).entity === entity);
+      return state.graph.nodes.filter(e => {
+        return (e.edges.find(e => edges.includes(e))
+          && (e.id !== id));
+      })
+    } catch {
+      return [];
+    }
+  }
+}
+export { adjacentNodes };
 export default graphReducer;
