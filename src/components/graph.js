@@ -190,16 +190,30 @@ const Graph = (props) => {
       if (typeof results === "undefined") {
         return;
       }
-      setTimeout(async () => {
-        delete results.redirects;
-        results = results[Object.keys(results)[0]];
-        callback(id, results)
-      }, 0);
+      delete results.redirects;
+      results = results[Object.keys(results)[0]];
+      callback(id, results)
     }
     api.buildRequest(options).forEach(r => {
       const resultsGenerator = api.fetchAndContinue(r.url);
       getResults(resultsGenerator, callback, r.pageid || r.cmpageid);
     });
+  }
+
+  const focusNode = (node) => {
+    const distance = 80;
+    const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+
+    fgRef.current.cameraPosition(
+      { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+      node, // lookAt ({ x, y, z })
+      1500  // ms transition duration
+    );
+    dispatch({type: "drawer/content", payload: {
+      component: node.entity,
+      title: node.name,
+      id: node.id
+    }});
   }
 
   useEffect(() => {
@@ -233,6 +247,9 @@ const Graph = (props) => {
       case "removeNode":
         removeNode(options.id);
         return;
+      case "focusNode":
+        focusNode(options.node);
+        return;
       case "categoriesLookup":
         categoriesLookup(options);
         return;
@@ -251,60 +268,12 @@ const Graph = (props) => {
       }))
     });
   }, [nodes, edges]);
-  useEffect(() => {
-    console.log(graphData);
-  }, [graphData]);
-  //~ useEffect(() => {
-    //~ setGraphData({
-      //~ nodes: [...Object.values(nodes)].map(e => ({
-        //~ name: e.name,
-        //~ id: e.id,
-        //~ entity: e.entity,
-        //~ val: (e.edges || []).reduce((a,b) => {
-          //~ return (a+1/edges[b].distance);
-        //~ },1)
-      //~ })),
-      //~ links: [...Object.values(edges)].map(e => ({
-        //~ id: e.id,
-        //~ source: e.source,
-        //~ target: e.target,
-        //~ entity: e.entity
-      //~ }))
-    //~ });
-  //~ },[edges]);
+  
   return (
     <ForceGraph3D
       linkOpacity={0.25}
-      linkColor={ e => {
-          switch (e.entity) {
-            case "backlink":
-              return "#1b5299";
-            case "outlink":
-              return "#1b5299";
-            case "taxonomy":
-              return "#fbfbf2";
-            default:
-              return "#fbfbf2";
-          }
-        }
-      }
-      onNodeClick={
-        (e) => {
-          const distance = 80;
-          const distRatio = 1 + distance/Math.hypot(e.x, e.y, e.z);
-
-          fgRef.current.cameraPosition(
-            { x: e.x * distRatio, y: e.y * distRatio, z: e.z * distRatio }, // new position
-            e, // lookAt ({ x, y, z })
-            1500  // ms transition duration
-          );
-          dispatch({type: "drawer/content", payload: {
-            component: e.entity,
-            title: e.name,
-            id: e.id
-          }});
-        }
-      }
+      linkColor="#fbfbf2"
+      onNodeClick={ focusNode }
       ref={fgRef}
       nodeColor={ e => e.entity === "category" ? "#ea526f":"#1b5299" }
       nodeOpacity={ 1 }
