@@ -1,3 +1,4 @@
+import Locate from "./drawer-views/locate.js";
 import Article from "./drawer-views/article.js";
 import Category from "./drawer-views/category.js";
 import AddSearch from "./drawer-views/addSearch.js";
@@ -17,6 +18,8 @@ const Drawer = (props) => {
       return;
     }
     switch (content.component) {
+      case "locate":
+        return (<Locate action={ handleActions }/>);
       case "addSearch":
         return (<AddSearch lang={ lang } handleSubmit={
           (e) => {
