@@ -25,7 +25,14 @@ Are you sure?`)) {
       >
         <span className="material-icons-outlined">zoom_in</span>
       </button>
-      <button title="search for a node on the graph">
+      <button title="search for a node on the graph"
+        onClick={ () => {
+          handleActions({
+            component: "locate",
+            title: "Locate a node"
+          });
+        }}
+      >
         <span className="material-icons-outlined">location_searching</span>
       </button>
       <button
