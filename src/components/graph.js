@@ -6,8 +6,10 @@ import WikiAPI from "../wikiApi.js";
 let api;
 
 const Graph = (props) => {
+  const worker = props.worker;
   const dispatch = useDispatch();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+  const prevNodesRef = useRef();
   const searchString = useSelector(state => state.init.searchString);
   const drawerAction = useSelector(state => state.drawer.action);
   const lang = useSelector(state => state.init.lang);
@@ -15,148 +17,57 @@ const Graph = (props) => {
   const edges = useSelector(state => state.graph.edges);
   const fgRef = useRef();
 
-  const createNode = async (options) => {
-    const {
-      ns,
-      pageid,
-      title
-    } = options;
-    if (typeof pageid === "undefined") { //this is a "missing" article
-      return;
-    }
-    if (pageid === false) { //this is coming from our search form
-      const url = api.buildRequest({
-        action: "query",
-        list: "search",
-        srsearch: title,
-        srnamespace: 0,
-        srlimit: 1
-      })[0].url;
-      let results = await fetch(url);
-      results = await results.json();
-      results = results.query.search[0];
-      createNode(results);
-      articlesLookup({
-        pageids: [results.pageid]
-      },true);
-      return;
-    }
-    dispatch({ type: "nodes/create", payload: {
-      id: pageid,
-      entity: (ns === 0) ? "article" : "category",
-      name: title
-    }});
+  const workerDispatch = (options) => {
+    worker.postMessage({
+      action: "dispatch",
+      options
+    });
   }
-  const createEdge = (options) => {
-    const {
-      entity,
-      input,
-      output,
-      duplex,
-      distance
-    } = options;
-    dispatch({ type: "edges/create", payload: {
-      entity,
-      input,
-      output,
-      duplex,
-      distance
+
+  const workerCallback = (options) => {
+    worker.postMessage({
+      action: "lookupCallback",
+      options
+    });
+  }
+
+  const createNode = async (title) => {
+    const url = api.buildRequest({
+      action: "query",
+      list: "search",
+      srsearch: title,
+      srnamespace: 0,
+      srlimit: 1
+    })[0].url;
+    let results = await fetch(url);
+    results = await results.json();
+    results = results.query.search[0];
+    workerDispatch({ type: "nodes/create", payload: {
+      id: results.pageid,
+      entity: (results.ns === 0) ? "article" : "category",
+      name: results.title
     }});
+    articlesLookup({
+      pageids: [results.pageid]
+    },true);
+    return;
   }
   const removeNode = (id) => {
-    nodes.find(e => e.id === id).edges.forEach(e => {
-      removeEdge(e);
-    });
-    dispatch({ type: "nodes/remove", payload: { id }});
+    workerDispatch({ type: "nodes/remove", payload: { id }});
   }
   const removeEdge = async (id) => {
-    dispatch({ type: "edges/unlink", payload: { id }});
-    dispatch({ type: "edges/remove", payload: { id }});
+    workerDispatch({ type: "edges/unlink", payload: { id }});
+    workerDispatch({ type: "edges/remove", payload: { id }});
   }
   const categoriesLookup = (options) => {
-    const callback = (id, pages) => {
-      pages.forEach(async e => {
-        if (typeof nodes.find(e => e.id === e.pageid) === "undefined") {
-          createNode({
-            ns: e.ns,
-            pageid: e.pageid,
-            title: e.title
-          });
-        }
-        createEdge({
-          entity: "taxonomy",
-          output: id,
-          input: e.pageid,
-          duplex: true,
-          distance: 3
-        });
-      });
-      //~ const toLookup = pages.filter(e =>
-        //~ ((e.ns === 0)
-        //~ && (!(nodes[e.pageid] && nodes[e.pageid].loaded))));
-      //~ articlesLookup({
-        //~ pageids: toLookup.map(e => e.pageid)
-      //~ });
-    }
     options.action = "query";
     options.list = "categorymembers";
     options.cmlimit = 500;
     options.cmtype = ["page", "subcat"];
-    lookup(options, callback);
-    dispatch({ type: "nodes/loaded", payload: { id: options.cmpageid } });
+    lookup(options, "categoryMembers");
+    workerDispatch({ type: "nodes/loaded", payload: { id: options.cmpageid } });
   }
   const articlesLookup = (options, init=false) => {
-    const callback = (page, linkOptions) => {
-      if (typeof page.pageid === "undefined") {
-        return;
-      }
-      if (typeof nodes.find(e => e.id === page.pageid) === "undefined") {
-        createNode({
-          ns: page.ns,
-          pageid: page.pageid,
-          title: page.title
-        });
-      }
-      createEdge(linkOptions);
-    }
-    const lhCallback = (id, links) => {
-      console.log("lhCallback");
-      Object.values(links).forEach(page => {
-        Object.values(page.linkshere).forEach(e => {
-          callback(e, {
-            entity: "backlink",
-            output: id,
-            input: e.pageid,
-            duplex: false,
-            distance: 2
-          });
-        });
-      });
-    };
-    const plCallback = (id, links) => {
-      console.log("plCallback");
-      Object.values(links).forEach(e => {
-        callback(e, {
-          entity: "outlink",
-          input: id,
-          output: e.pageid,
-          duplex: false,
-          distance: 2
-        });
-      });
-    };
-    const clCallback = (id, categories) => {
-      console.log("clCallback");
-      Object.values(categories).forEach(e => {
-        callback(e, {
-          entity: "taxonomy",
-          input: id,
-          output: e.pageid,
-          duplex: true,
-          distance: 10
-        });
-      });
-    }
     options.action = "query";
     const lhOptions = { ...options };
     const plOptions = { ...options };
@@ -176,13 +87,19 @@ const Graph = (props) => {
     clOptions.gclshow = "!hidden";
   
     [
-      [clOptions, clCallback],
-      [plOptions, plCallback],
-      [lhOptions, lhCallback],
+      [clOptions, "categoriesList"],
+      [plOptions, "pageLinks"],
+      [lhOptions, "linksHere"],
     ].forEach(e => {
       lookup(e[0],e[1]);
     });
-    dispatch({ type: "nodes/loaded", payload: { id: options.pageids } });
+    let ids = options.pageids;
+    if (typeof ids !== "object") {
+      ids = [ids];
+    }
+    ids.forEach(id => {
+      workerDispatch({ type: "nodes/loaded", payload: { id } });
+    });
   }
   const lookup = (options, callback) => {
     const getResults = async (generator, callback, id) => {
@@ -192,7 +109,7 @@ const Graph = (props) => {
       }
       delete results.redirects;
       results = results[Object.keys(results)[0]];
-      callback(id, results)
+      workerCallback({ callback, id, results })
     }
     api.buildRequest(options).forEach(r => {
       const resultsGenerator = api.fetchAndContinue(r.url);
@@ -201,6 +118,7 @@ const Graph = (props) => {
   }
 
   const focusNode = (node) => {
+    node = graphData.nodes.find(e => e.id === node.id);
     const distance = 80;
     const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
 
@@ -219,11 +137,7 @@ const Graph = (props) => {
   useEffect(() => {
     const wikiAPI = new WikiAPI(lang); 
     api = wikiAPI;
-    createNode({
-      ns: 0,
-      title: searchString,
-      pageid: false
-    });
+    createNode(searchString);
   },[]);
   
   useEffect(() => {
@@ -235,11 +149,7 @@ const Graph = (props) => {
     const options = actionInput.options;
     switch (action) {
       case "addSearch":
-        createNode({
-          ns: 0,
-          title: options.searchString,
-          pageid: false
-        });
+        createNode(options.searchString);
         return;
       case "articlesLookup":
         articlesLookup(options);
@@ -257,10 +167,26 @@ const Graph = (props) => {
         return;
     }
   }, [drawerAction]);
+
   useEffect(() => {
+    //~ console.log(graphData);
+    prevNodesRef.current = graphData.nodes;
+  }, [graphData]);
+
+  useEffect(() => {
+    let graphNodes = [];
+    if (typeof prevNodesRef.current !== "undefined" && prevNodesRef.current.length > 0) {
+      graphNodes = [...prevNodesRef.current];        
+    }
+    graphNodes = graphNodes.filter(node => nodes[node.id]);
+    Object.values(nodes).forEach(node => {
+      if (!graphNodes.find(e => e.id === node.id)) {
+        graphNodes.push(node);
+      }
+    });
     setGraphData({
-      nodes,
-      links: edges.map(e => ({
+      nodes: graphNodes,
+      links: Object.values(edges).map(e => ({
         id: e.id,
         entity: e.entity,
         source: e.input,
