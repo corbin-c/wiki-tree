@@ -22,7 +22,7 @@ function Category(props) {
   return (<>
     <article>
       { (members.filter(e => e.entity === "category").length > 0)
-        ? (<details open="true">
+        ? (<details open={true}>
             <summary>Categories:</summary>
             <ul>
               { catMembers("category") }
@@ -31,7 +31,7 @@ function Category(props) {
         : (<></>)
       }
       { (members.filter(e => e.entity === "article").length > 0)
-        ? (<details open="true">
+        ? (<details open={true}>
             <summary>Pages:</summary>
             <ul>
               { catMembers("article") }

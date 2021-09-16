@@ -50,7 +50,7 @@ function Article(props) {
     <article dangerouslySetInnerHTML={ { "__html": extract } } />
     <article>
       { (categories.length > 0)
-        ? (<details open="true">
+        ? (<details open={true}>
             <summary>Categories:</summary>
             <ul>
               { relations(categories) }
@@ -59,7 +59,7 @@ function Article(props) {
         : (<></>)
       }
       { (links.length > 0)
-        ? (<details open="true">
+        ? (<details open={true}>
             <summary>Links:</summary>
             <ul>
               { relations(links) }
@@ -68,7 +68,7 @@ function Article(props) {
         : (<></>)
       }
       { (backlinks.length > 0)
-        ? (<details open="true">
+        ? (<details open={true}>
             <summary>Backlinks:</summary>
             <ul>
               { relations(backlinks) }
