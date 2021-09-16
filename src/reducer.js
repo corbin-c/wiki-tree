@@ -4,8 +4,8 @@ import drawerReducer from "./reducers/drawer.js";
 
 const initialState = {
   graph: {
-    nodes: [],
-    edges: []
+    nodes: {},
+    edges: {}
   },
   init: {
     lang: "",
