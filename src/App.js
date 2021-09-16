@@ -6,6 +6,7 @@ import ToolBar from "./components/toolbar.js";
 import Graph from "./components/graph.js";
 import "./index.css";
 const worker = new Worker("/mainWorker.js", { type: "module" });
+const graphDataWorker = new Worker("/graphDataWorker.js");
 
 function App() {
   const searchString = useSelector(state => state.init.searchString);
@@ -23,7 +24,7 @@ function App() {
       {
         (lang !== "" && searchString !== "") && (
         <>
-          <Graph worker={worker} />
+          <Graph mainWorker={worker} graphDataWorker={graphDataWorker} />
           <ToolBar />
         </>
         )

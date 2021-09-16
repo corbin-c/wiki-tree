@@ -6,10 +6,10 @@ import WikiAPI from "../wikiApi.js";
 let api;
 
 const Graph = (props) => {
-  const worker = props.worker;
+  const mainWorker = props.mainWorker;
+  const graphDataWorker = props.graphDataWorker;
   const dispatch = useDispatch();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
-  const prevNodesRef = useRef();
   const searchString = useSelector(state => state.init.searchString);
   const drawerAction = useSelector(state => state.drawer.action);
   const lang = useSelector(state => state.init.lang);
@@ -18,14 +18,14 @@ const Graph = (props) => {
   const fgRef = useRef();
 
   const workerDispatch = (options) => {
-    worker.postMessage({
+    mainWorker.postMessage({
       action: "dispatch",
       options
     });
   }
 
   const workerCallback = (options) => {
-    worker.postMessage({
+    mainWorker.postMessage({
       action: "lookupCallback",
       options
     });
@@ -169,29 +169,18 @@ const Graph = (props) => {
   }, [drawerAction]);
 
   useEffect(() => {
-    //~ console.log(graphData);
-    prevNodesRef.current = graphData.nodes;
-  }, [graphData]);
+    graphDataWorker.onmessage = (e) => {
+      setGraphData(e.data);
+    }
+  }, []);
 
   useEffect(() => {
-    let graphNodes = [];
-    if (typeof prevNodesRef.current !== "undefined" && prevNodesRef.current.length > 0) {
-      graphNodes = [...prevNodesRef.current];        
-    }
-    graphNodes = graphNodes.filter(node => nodes[node.id]);
-    Object.values(nodes).forEach(node => {
-      if (!graphNodes.find(e => e.id === node.id)) {
-        graphNodes.push(node);
+    graphDataWorker.postMessage({
+      oldNodes: JSON.stringify(graphData.nodes),
+      newState: {
+        nodes,
+        edges
       }
-    });
-    setGraphData({
-      nodes: graphNodes,
-      links: Object.values(edges).map(e => ({
-        id: e.id,
-        entity: e.entity,
-        source: e.input,
-        target: e.output
-      }))
     });
   }, [nodes, edges]);
   
