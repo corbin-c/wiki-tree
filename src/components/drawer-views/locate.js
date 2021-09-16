@@ -8,7 +8,7 @@ function Locate(props) {
   const [searchString,setSearchString] = useState("");
   const nodes = useSelector(state => state.graph.nodes);
   const displaySearchResults = () => {
-    return nodes
+    return Object.values(nodes)
       .filter(node => node.name.toLowerCase()
         .includes(searchString.toLowerCase())
       )
@@ -27,7 +27,7 @@ function Locate(props) {
   const submit = (e) => {
     e.preventDefault();
     let targetNode;
-    targetNode = nodes.find(node => node.name === searchString);
+    targetNode = Object.values(nodes).find(node => node.name === searchString);
     if (typeof targetNode !== "undefined") {
       action({ action: "focusNode", options: { node:targetNode }});
     } else {
