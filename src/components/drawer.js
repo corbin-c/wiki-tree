@@ -1,5 +1,6 @@
 import Locate from "./drawer-views/locate.js";
 import Article from "./drawer-views/article.js";
+import Settings from "./drawer-views/settings.js";
 import Category from "./drawer-views/category.js";
 import AddSearch from "./drawer-views/addSearch.js";
 import { useSelector, useDispatch } from "react-redux";
@@ -8,7 +9,6 @@ const Drawer = (props) => {
   const dispatch = useDispatch();
   const lang = useSelector(state => state.init.lang);
   const content = useSelector(state => state.drawer.content);
-
   const handleActions = (e) => {
     dispatch({type: "drawer/action", payload: e});
   }
@@ -19,7 +19,9 @@ const Drawer = (props) => {
     }
     switch (content.component) {
       case "locate":
-        return (<Locate action={ handleActions }/>);
+        return (<Locate action={ handleActions } />);
+      case "settings":
+        return (<Settings />);
       case "addSearch":
         return (<AddSearch lang={ lang } handleSubmit={
           (e) => {

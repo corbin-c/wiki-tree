@@ -16,18 +16,20 @@ const graphReducer = (state, action) => {
 const adjacentNodes = (id, entity) => {
   return (state) => {
     try {
-      const edges = state.graph.nodes[id].edges
-        .filter(e => 
+      let edges = state.graph.nodes[id].edges;
+      if (entity !== "*") {
+      edges = edges.filter(e => 
           state.graph.edges[e].entity === entity);
+      }
       let output = [];
       Object.values(state.graph.nodes).forEach(e => {
-        if (e.edges.find(e => edges.includes(e))
+        if ((typeof e.edges.find(e => edges.includes(e)) !== "undefined")
           && (e.id !== id)) {
           output.push(e);
         }
       });
       return output;
-    } catch {
+    } catch(e) {
       return [];
     }
   }

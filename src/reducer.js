@@ -1,20 +1,28 @@
-import graphReducer from "./reducers/graph.js";
 import initReducer from "./reducers/init.js";
+import workerReducer from "./reducers/worker.js";
 import drawerReducer from "./reducers/drawer.js";
+import settingsReducer from "./reducers/settings.js";
 
 const initialState = {
-  graph: {
-    nodes: {},
-    edges: {}
-  },
   init: {
-    lang: "",
+    start: false,
+    lang: navigator.language.split("-")[0] || "en",
     searchString: ""
   },
   drawer: {
     content: {},
     action: {}
   },
+  settings: {
+    bloom: 0,
+    arrows: 0,
+    nodeRepulsion: -50,
+    curvature: 0
+  },
+  worker: {
+    postMessage: () => {},
+    message: {}
+  }
 }
 /*
  * https://github.com/vasturiano/react-force-graph/blob/master/example/click-to-focus/index.html
@@ -23,15 +31,18 @@ const initialState = {
  */
 export default function rootReducer(state = initialState, action) {
   if (action.reset) {
+    console.warn("RESET");
     state = {...state,
-      graph: initialState.graph,
       init: initialState.init,
-      drawer: initialState.drawer
+      settings: initialState.settings,
+      drawer: initialState.drawer,
+      worker: initialState.worker
     };
   }
   return {
-    graph: graphReducer(state.graph, action),
     init: initReducer(state.init, action),
-    drawer: drawerReducer(state.drawer, action)
+    drawer: drawerReducer(state.drawer, action),
+    worker: workerReducer(state.worker, action),
+    settings: settingsReducer(state.settings, action)
   }
 }

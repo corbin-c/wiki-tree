@@ -5,26 +5,38 @@ import Drawer from "./components/drawer.js";
 import ToolBar from "./components/toolbar.js";
 import Graph from "./components/graph.js";
 import "./index.css";
-const worker = new Worker("/mainWorker.js", { type: "module" });
-const graphDataWorker = new Worker("/graphDataWorker.js");
+const worker = new Worker("/mainWorker.js");
 
 function App() {
-  const searchString = useSelector(state => state.init.searchString);
-  const lang = useSelector(state => state.init.lang);
+  const init = useSelector(state => state.init);
   const dispatch = useDispatch();
+
   useEffect(() => {
-    worker.onmessage = (e) => {
-      const graphState = e.data;
-      dispatch({type: "graph/set", payload: graphState});
+    if (init.start === true) {
+      worker.postMessage({
+        action: "dispatch",
+        options: { type: "reset" }
+      });
     }
+  },[init.start])
+  
+  useEffect(() => {
+    dispatch({ type: "worker/entity", payload: worker });
+    worker.onmessage = (e) => {
+      dispatch({ type: "worker/message", payload: e.data });
+    };
   },[]);
+  
   return (
     <main className="App">
       <Splash />
       {
-        (lang !== "" && searchString !== "") && (
+        ((init.start === true)
+          && (init.lang !== "")
+          && (init.searchString !== ""))
+          && (
         <>
-          <Graph mainWorker={worker} graphDataWorker={graphDataWorker} />
+          <Graph />
           <ToolBar />
         </>
         )

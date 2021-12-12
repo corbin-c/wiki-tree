@@ -10,7 +10,7 @@ const ToolBar = (props) => {
 Are you sure?`)) {
       return;
     }
-    window.location.reload();
+    dispatch( { reset: true, type:"reset" } );
   }
   return (
     <aside id="toolbar">
@@ -41,7 +41,14 @@ Are you sure?`)) {
       >
         <span className="material-icons-outlined">refresh</span>
       </button>
-      <button title="fine tune your graph">
+      <button title="fine tune your graph"
+        onClick={ () => {
+          handleActions({
+            component: "settings",
+            title: "Settings"
+          });
+        }}
+      >
         <span className="material-icons-outlined">settings</span>
       </button>
       <button title="what am I seeing? help!">

@@ -1,12 +1,14 @@
+let timer;
 onmessage = function(e) {
   const oldNodes = JSON.parse(e.data.oldNodes);
   const {
     nodes,
     edges
   } = e.data.newState;
+  console.log(e.data);
   let graphNodes = [];
   if (typeof oldNodes !== "undefined" && oldNodes.length > 0) {
-    graphNodes = [...oldNodes];        
+    graphNodes = [...oldNodes];
   }
   graphNodes = graphNodes.filter(node => nodes[node.id]);
   Object.values(nodes).forEach(node => {
@@ -14,13 +16,16 @@ onmessage = function(e) {
       graphNodes.push(node);
     }
   });
-  postMessage({
-    nodes: graphNodes,
-    links: Object.values(edges).map(e => ({
-      id: e.id,
-      entity: e.entity,
-      source: e.input,
-      target: e.output
-    }))
-  });
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    postMessage({
+      nodes: graphNodes,
+      links: Object.values(edges).map(e => ({
+        id: e.id,
+        entity: e.entity,
+        source: e.input,
+        target: e.output
+      }))
+    });
+  }, 12);
 }

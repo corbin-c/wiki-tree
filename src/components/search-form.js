@@ -1,18 +1,19 @@
-import React, { useState } from "react";
 import SearchInput from "./search-input.js";
 import LangSelect from "./lang-select.js";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 function SearchForm(props) {
-  const [lang,setLang] = useState("en");
-  const [searchString,setSearchString] = useState("");
   const dispatch = useDispatch();
+  const lang = useSelector(state => state.init.lang);
   const submit = (event) => {
     event.preventDefault();
-    dispatch({ type: "init", payload: {
-      lang,
-      searchString
-    }}); 
+    dispatch({ type: "init/start" }); 
+  }
+  const setLang = (value) => {
+    dispatch({ type: "init/set", payload: { key: "lang", value }});
+  }
+  const setSearchString = (value) => {
+    dispatch({ type: "init/set", payload: { key: "searchString", value }});
   }
   return (
     <form onSubmit={ submit }>

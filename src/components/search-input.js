@@ -6,7 +6,6 @@ function SearchInput(props) {
   const [searchString,setSearchString] = useState("");
   const [resultsList,setResults] = useState([]);
   const timer = useRef(null);
-  const wiki = new WikiAPI(lang);
   const WAIT_INTERVAL = 1000;
 
   const displaySearchResults = () => {
@@ -20,6 +19,7 @@ function SearchInput(props) {
   }
 
   const performSearch = async (searchString, input) => {
+    const wiki = new WikiAPI(lang);
     if (searchString.length > 0) {
       //perform full text search
       const url = wiki.buildRequest({
@@ -36,7 +36,7 @@ function SearchInput(props) {
         setResults(results);
         setTimeout(() => {
           input.focus();
-        }, 100);
+        }, 10);
       } catch(e) {
         console.error(e);
       }
@@ -68,6 +68,7 @@ function SearchInput(props) {
     <>
       <label htmlFor={ "searchInput"+id }>Search terms:</label>
       <input
+        autoFocus={ true }
         autoComplete="off"
         id={ "searchInput"+id }
         onChange={ inputChange }

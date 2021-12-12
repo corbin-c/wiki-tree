@@ -1,19 +1,15 @@
 import { useSelector } from "react-redux";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function Locate(props) {
   const {
-    action
+    action,
   } = props;
+  const worker = useSelector(state => state.worker);
+  const [results,setResults] = useState([]);
   const [searchString,setSearchString] = useState("");
-  const nodes = useSelector(state => state.graph.nodes);
   const displaySearchResults = () => {
-    return Object.values(nodes)
-      .filter(node => node.name.toLowerCase()
-        .includes(searchString.toLowerCase())
-      )
-      .sort((a,b) => a.name.localeCompare(b.name))
-      .map((item) => {
+    return results.map((item) => {
       return <option
         value={ item.name }
         key={ item.id }>
@@ -23,11 +19,17 @@ function Locate(props) {
   }
   const inputChange = (e) => {
     setSearchString(e.target.value);
+    worker.entity.postMessage({ action: "search", options: { searchString } });
   }
+  useEffect(() => {
+    if (worker.message.search) {
+      setResults(worker.message.search);
+    }
+  },[worker.message]);
   const submit = (e) => {
     e.preventDefault();
     let targetNode;
-    targetNode = Object.values(nodes).find(node => node.name === searchString);
+    targetNode = results.find(node => node.name === searchString);
     if (typeof targetNode !== "undefined") {
       action({ action: "focusNode", options: { node:targetNode }});
     } else {

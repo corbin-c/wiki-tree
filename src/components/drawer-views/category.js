@@ -1,27 +1,41 @@
-import { adjacentNodes } from "../../reducers/graph.js";
 import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
 
 function Category(props) {
   const {
     id,
-    action
+    action,
   } = props;
-  const members = useSelector(adjacentNodes(id, "taxonomy"));
+
+  const worker = useSelector(state => state.worker);
+  const [node,setNode] = useState({ adjacent: [] });
 
   const focus = (node) => {
     action({ action: "focusNode", options: { node }});
   }
   const catMembers = (entity) => {
-    return members.filter(e => e.entity === entity).map(sub => {
+    return node.adjacent.filter(e => e.entity === entity).map(sub => {
       return (<li key={ sub.id } onClick={ () => { focus(sub) } }>
-        { sub.name }
+        { (entity === "category")
+            ? sub.name.split(":").slice(1).join(":")
+            : sub.name }
       </li>)
     });
   }
 
+  useEffect(() => {
+    if ((worker.message.node) && (worker.message.node.id === id)) {
+      setNode(worker.message.node);
+    }
+  },[worker.message]);
+
+  useEffect(() => {
+    worker.entity.postMessage({ action: "getNode", options: { id }});
+  },[id]);
+
   return (<>
     <article>
-      { (members.filter(e => e.entity === "category").length > 0)
+      { (node.adjacent.filter(e => e.entity === "category").length > 0)
         ? (<details open={true}>
             <summary>Categories:</summary>
             <ul>
@@ -30,7 +44,7 @@ function Category(props) {
           </details>)
         : (<></>)
       }
-      { (members.filter(e => e.entity === "article").length > 0)
+      { (node.adjacent.filter(e => e.entity === "article").length > 0)
         ? (<details open={true}>
             <summary>Pages:</summary>
             <ul>

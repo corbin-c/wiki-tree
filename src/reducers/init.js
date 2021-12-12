@@ -4,8 +4,16 @@ const initReducer = (state, action) => {
     payload
   } = action;
   switch (type) {
-    case "init":
-      return payload;
+    case "init/set":
+      return {
+        ...state,
+        [payload.key]: payload.value
+      }
+    case "init/start":
+      return {
+        ...state,
+        start: true
+      };
     default:
       return state;
   }

@@ -2,10 +2,15 @@ import { useSelector } from "react-redux";
 import SearchForm from "./search-form.js";
 
 function Splash(props) {
-  const searchString = useSelector(state => state.init.searchString);
-  const lang = useSelector(state => state.init.lang);
+  const init = useSelector(state => state.init);
   return (
-    <section id="splash" className={ (lang !== "" && searchString !== "") ? "hidden":"" }>
+    <section id="splash" className={
+      (init.start === true
+        && init.lang !== ""
+        && init.searchString !== "")
+        ? "hidden"
+        :""
+      }>
       <h1>Welcome to Wiki-Tree!</h1>
       <p>select your language and start exploring</p>
       <img src="./logo.svg" alt="Wiki-Tree logo" />

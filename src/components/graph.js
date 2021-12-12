@@ -3,29 +3,41 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import WikiAPI from "../wikiApi.js";
 
+const graphWorker = new Worker("/graphDataWorker.js");
+
 let api;
 
 const Graph = (props) => {
-  const mainWorker = props.mainWorker;
-  const graphDataWorker = props.graphDataWorker;
   const dispatch = useDispatch();
+  const [idle, setIdle] = useState(false);
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+  const [highlight, setHighlight] = useState({ nodes: [], edges: [] });
+
+  const worker = useSelector(state => state.worker.entity);
+  const message = useSelector(state => state.worker.message);
+
   const searchString = useSelector(state => state.init.searchString);
-  const drawerAction = useSelector(state => state.drawer.action);
   const lang = useSelector(state => state.init.lang);
-  const nodes = useSelector(state => state.graph.nodes);
-  const edges = useSelector(state => state.graph.edges);
+
+  const drawerAction = useSelector(state => state.drawer.action);
+
+  const nodeRepulsion = useSelector(state => state.settings.nodeRepulsion);
+  const curvature = useSelector(state => state.settings.curvature);
+  const bloom = useSelector(state => state.settings.bloom);
+  const arrows = useSelector(state => state.settings.arrows);
+
+  const timer = useRef(null);
   const fgRef = useRef();
 
   const workerDispatch = (options) => {
-    mainWorker.postMessage({
+    worker.postMessage({
       action: "dispatch",
       options
     });
   }
 
   const workerCallback = (options) => {
-    mainWorker.postMessage({
+    worker.postMessage({
       action: "lookupCallback",
       options
     });
@@ -62,7 +74,7 @@ const Graph = (props) => {
   const categoriesLookup = (options) => {
     options.action = "query";
     options.list = "categorymembers";
-    options.cmlimit = 500;
+    options.cmlimit = 5;
     options.cmtype = ["page", "subcat"];
     lookup(options, "categoryMembers");
     workerDispatch({ type: "nodes/loaded", payload: { id: options.cmpageid } });
@@ -72,9 +84,10 @@ const Graph = (props) => {
     const lhOptions = { ...options };
     const plOptions = { ...options };
     const clOptions = { ...options };
-    lhOptions.prop = ["linkshere"];
-    lhOptions.lhlimit = 500;
-    lhOptions.lhnamespace = 0;
+    lhOptions.prop = "info";
+    lhOptions.generator = "linkshere";
+    lhOptions.glhlimit = 500;
+    lhOptions.glhnamespace = 0;
 
     plOptions.gpllimit = 500;
     plOptions.gplnamespace = 0;
@@ -86,11 +99,13 @@ const Graph = (props) => {
     clOptions.prop = "info";
     clOptions.gclshow = "!hidden";
   
-    [
+    /*for (let e of */[
       [clOptions, "categoriesList"],
       [plOptions, "pageLinks"],
       [lhOptions, "linksHere"],
-    ].forEach(e => {
+    ]/*) {
+      lookup(e[0],e[1]);
+    }*/.forEach(e => {
       lookup(e[0],e[1]);
     });
     let ids = options.pageids;
@@ -109,7 +124,8 @@ const Graph = (props) => {
       }
       delete results.redirects;
       results = results[Object.keys(results)[0]];
-      workerCallback({ callback, id, results })
+      workerCallback({ callback, id, results });
+      getResults(generator, callback, id);
     }
     api.buildRequest(options).forEach(r => {
       const resultsGenerator = api.fetchAndContinue(r.url);
@@ -134,12 +150,50 @@ const Graph = (props) => {
     }});
   }
 
+  const nodeHover = (id) => {
+    const adjacent = graphData.nodes.find(e => e.id === id).adjacent;
+    setHighlight({
+      edges: adjacent.map(e => e.edgeId),
+      nodes: [...adjacent.map(e => e.id), id]
+    });
+  }
+
   useEffect(() => {
+// eslint-disable-next-line no-undef
+    //~ let z = new SharedArrayBuffer(2048)
+    //~ console.error("sab",z);
+
     const wikiAPI = new WikiAPI(lang); 
     api = wikiAPI;
     createNode(searchString);
+    graphWorker.onmessage = (e) => {
+      setGraphData(e.data);
+    }
   },[]);
-  
+
+  useEffect(() => {
+    console.log(message);
+    if (message.state) {
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => {
+        graphWorker.postMessage({
+          oldNodes: JSON.stringify(graphData.nodes),
+          newState: message.state
+        });
+        //~ worker.postMessage({
+          //~ action: "getGraph",
+          //~ options: {
+            //~ oldNodes: JSON.stringify(graphData.nodes)
+          //~ }
+        //~ });
+      }, 12);
+    } else if (message.graph) {
+      setGraphData(message.graph);
+    } else if (message.articlesLookup) {
+      articlesLookup(message.articlesLookup);
+    }
+  },[message]);
+
   useEffect(() => {
     const actionInput = drawerAction;
     if (!actionInput.action) {
@@ -167,31 +221,46 @@ const Graph = (props) => {
         return;
     }
   }, [drawerAction]);
-
-  useEffect(() => {
-    graphDataWorker.onmessage = (e) => {
-      setGraphData(e.data);
-    }
-  }, []);
-
-  useEffect(() => {
-    graphDataWorker.postMessage({
-      oldNodes: JSON.stringify(graphData.nodes),
-      newState: {
-        nodes,
-        edges
-      }
-    });
-  }, [nodes, edges]);
   
+  useEffect(() => {
+    fgRef.current.d3Force("charge").strength(nodeRepulsion);
+    if (idle) {
+      fgRef.current.d3ReheatSimulation();
+    }
+  },[nodeRepulsion]);
+
   return (
     <ForceGraph3D
-      linkOpacity={0.25}
-      linkColor="#fbfbf2"
+      onEngineStop={ () => { setIdle(true) } }
+      linkOpacity={1}
+      linkColor={ (e) => {
+          if (highlight.edges.includes(e.id)) {
+            return "#fbfbf2ff";
+          }
+          return "#fbfbf240";
+        }
+      }
+      linkCurvature={ curvature }
+      onNodeHover={ (e) => { 
+          if (e === null) {
+            setHighlight({ nodes: [], edges: []});
+            return;
+          }
+          nodeHover(e.id);
+        }
+      }
       onNodeClick={ focusNode }
       ref={fgRef}
-      nodeColor={ e => e.entity === "category" ? "#ea526f":"#1b5299" }
-      nodeOpacity={ 1 }
+      nodeColor={ e => {
+          if (highlight.nodes.includes(e.id)) {
+            return "#fbfbf2";
+          }
+          return (e.entity === "category") ? "#ea526f":"#1b5299"
+        }
+      }
+      linkDirectionalArrowLength={ arrows }
+      linkDirectionalArrowRelPos={1}
+      nodeOpacity={ .99 }
       backgroundColor="rgba(0,0,0,0)"
       graphData={ graphData }
     />

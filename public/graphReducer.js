@@ -4,6 +4,11 @@ const graphReducer = (state, action) => {
     payload
   } = action;
   switch (type) {
+    case "reset":
+      return {
+        edges: {},
+        nodes: {}
+      }
     case "nodes/create":
       if (state.nodes[payload.id]) {
         return state;
@@ -15,10 +20,14 @@ const graphReducer = (state, action) => {
           [payload.id]: {
             ...payload,
             edges: [],
+            adjacent: []
           }
         }
       }
     case "edges/create":
+      if (payload.output === payload.input) {
+        return state;
+      }
       const edgeExists = Object.values(state.edges).find(edge => {
         if (payload.duplex === true) {
           return ((((edge.input === payload.input)
@@ -38,17 +47,33 @@ const graphReducer = (state, action) => {
       const nodes = {...state.nodes};
       nodes[payload.input] = {
         ...nodes[payload.input],
-        edges: [...nodes[payload.input].edges, id]
+        edges: [...nodes[payload.input].edges, id],
+        adjacent: [...nodes[payload.input].adjacent, {
+          name: nodes[payload.output].name,
+          id: payload.output,
+          entity: nodes[payload.output].entity,
+          edgeId: id,
+          edgeEntity: payload.entity
+        }]
       };
       nodes[payload.output] = {
         ...nodes[payload.output],
-        edges: [...nodes[payload.output].edges, id]
+        edges: [...nodes[payload.output].edges, id],
+        adjacent: [...nodes[payload.output].adjacent, {
+          name: nodes[payload.input].name,
+          id: payload.input,
+          entity: nodes[payload.input].entity,
+          edgeId: id,
+          edgeEntity: payload.entity
+        }]
       };
       const newEdge = {
         id,
         entity: payload.entity,
         input: payload.input,
         output: payload.output,
+        source: payload.input,
+        target: payload.output,
         distance: payload.distance,
         duplex: payload.duplex,
       }
@@ -101,11 +126,13 @@ const graphReducer = (state, action) => {
         .filter(e => e !== payload.id);
       unlinkedNodes[edge.input] = {
         ...unlinkedNodes[edge.input],
-        edges: sourceEdges
+        edges: sourceEdges,
+        adjacent: [...unlinkedNodes[edge.input].adjacent].filter(e => e.edgeId !== payload.id)
       }
       unlinkedNodes[edge.output] = {
         ...unlinkedNodes[edge.output],
-        edges: targetEdges
+        edges: targetEdges,
+        adjacent: [...unlinkedNodes[edge.output].adjacent].filter(e => e.edgeId !== payload.id)
       }
       if (sourceEdges.length === 0) {
         delete unlinkedNodes[edge.input];
