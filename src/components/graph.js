@@ -166,26 +166,25 @@ const Graph = (props) => {
     const wikiAPI = new WikiAPI(lang); 
     api = wikiAPI;
     createNode(searchString);
-    graphWorker.onmessage = (e) => {
-      setGraphData(e.data);
-    }
+    //~ graphWorker.onmessage = (e) => {
+      //~ setGraphData(e.data);
+    //~ }
   },[]);
 
   useEffect(() => {
-    console.log(message);
     if (message.state) {
       clearTimeout(timer.current);
       timer.current = setTimeout(() => {
-        graphWorker.postMessage({
-          oldNodes: JSON.stringify(graphData.nodes),
-          newState: message.state
-        });
-        //~ worker.postMessage({
-          //~ action: "getGraph",
-          //~ options: {
-            //~ oldNodes: JSON.stringify(graphData.nodes)
-          //~ }
+        //~ graphWorker.postMessage({
+          //~ oldNodes: JSON.stringify(graphData.nodes),
+          //~ newState: message.state
         //~ });
+        worker.postMessage({
+          action: "getGraph",
+          options: {
+            oldNodes: JSON.stringify(graphData.nodes)
+          }
+        });
       }, 12);
     } else if (message.graph) {
       setGraphData(message.graph);

@@ -5,7 +5,6 @@ onmessage = function(e) {
     nodes,
     edges
   } = e.data.newState;
-  console.log(e.data);
   let graphNodes = [];
   if (typeof oldNodes !== "undefined" && oldNodes.length > 0) {
     graphNodes = [...oldNodes];

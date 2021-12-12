@@ -36,7 +36,6 @@ export default function rootReducer(state = initialState, action) {
       init: initialState.init,
       settings: initialState.settings,
       drawer: initialState.drawer,
-      worker: initialState.worker
     };
   }
   return {
