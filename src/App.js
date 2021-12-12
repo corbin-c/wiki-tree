@@ -5,7 +5,7 @@ import Drawer from "./components/drawer.js";
 import ToolBar from "./components/toolbar.js";
 import Graph from "./components/graph.js";
 import "./index.css";
-const worker = new Worker("/mainWorker.js");
+const worker = (process.env.NODE_ENV === "development") ? new Worker("/mainWorker.js") : new Worker("/wiki-tree/mainWorker.js");
 
 function App() {
   const init = useSelector(state => state.init);
